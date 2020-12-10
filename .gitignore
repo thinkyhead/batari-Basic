@@ -40,10 +40,6 @@
 .*.swp
 
 ########## batari Basic specific ignores ##########
-2600basic
-bbfilter
-optimize
-postprocess
-preprocess
+source/build
 packages
 packages/*
