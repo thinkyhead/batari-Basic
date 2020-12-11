@@ -1,5 +1,9 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
-
+/**
+ * keywords.c
+ * Entry-point for individual Batari Basic statement conversion.
+ *
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
 #include "keywords.h"
 #include "statements.h"
 #include <stdlib.h>
@@ -253,9 +257,7 @@ void keywords(char **cstatement) {
 		else if (SMATCH(1, "const"))			doconst(statement);
 		else if (SMATCH(1, "dim"))				dim(statement);
 		else if (SMATCH(1, "for"))				dofor(statement);
-		else if (SMATCH(1, "next"))				next(statement);
-		else if (SMATCH(1, "next\n"))			next(statement);
-		else if (SMATCH(1, "next\r"))			next(statement);
+		else if (EMATCH(1, "next"))				next(statement);
 		else if (SMATCH(1, "gosub"))			gosub(statement);
 		else if (SMATCH(1, "pfpixel"))			pfpixel(statement);
 		else if (SMATCH(1, "pfhline"))			pfhline(statement);
@@ -263,25 +265,13 @@ void keywords(char **cstatement) {
 		else if (SMATCH(1, "pfvline"))			pfvline(statement);
 		else if (SMATCH(1, "pfscroll"))			pfscroll(statement);
 		else if (SMATCH(1, "drawscreen"))		drawscreen();
-		else if (SMATCH(1, "asm"))				doasm();
-		else if (SMATCH(1, "pop"))				dopop();
-		else if (SMATCH(1, "rem")) { 			rem(statement); return; }
-		else if (SMATCH(1, "asm\n"))			doasm();
-		else if (SMATCH(1, "pop\n"))			dopop();
-		else if (SMATCH(1, "rem\n")) {			rem(statement); return; }
-		else if (SMATCH(1, "asm\r"))			doasm();
-		else if (SMATCH(1, "pop\r"))			dopop();
-		else if (SMATCH(1, "rem\r")) {			rem(statement); return; }
+		else if (EMATCH(1, "asm"))				doasm();
+		else if (EMATCH(1, "pop"))				dopop();
+		else if (EMATCH(1, "rem")) { 			rem(statement); return; }
 		else if (SMATCH(1, "set"))				set(statement);
-		else if (SMATCH(1, "return"))			doreturn(statement);
-		else if (SMATCH(1, "reboot"))			doreboot();
-		else if (SMATCH(1, "vblank"))			vblank();
-		else if (SMATCH(1, "return\n"))			doreturn(statement);
-		else if (SMATCH(1, "reboot\n"))			doreboot();
-		else if (SMATCH(1, "vblank\n"))			vblank();
-		else if (SMATCH(1, "return\r"))			doreturn(statement);
-		else if (SMATCH(1, "reboot\r"))			doreboot();
-		else if (SMATCH(1, "vblank\r"))			vblank();
+		else if (EMATCH(1, "return"))			doreturn(statement);
+		else if (EMATCH(1, "reboot"))			doreboot();
+		else if (EMATCH(1, "vblank"))			vblank();
 		else if (  IMATCH(1, "pfcolors:")
 				|| IMATCH(1, "pfheights:"))		playfieldcolorandheight(statement);
 		else if (IMATCH(1, "bkcolors:"))		bkcolors(statement);

@@ -1,9 +1,15 @@
+/**
+ * preprocess.lex
+ * Preprocess Batari Basic to check for lexical correctness
+ *
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
 %{
-#include <stdlib.h>  
+#include <stdlib.h>
 int linenumber=1;
 int yydebug=1;
-//void yyerror(char *);  
-%}    
+//void yyerror(char *);
+%}
 %x mcomment
 %x scomment
 %x endmcomment
@@ -22,7 +28,7 @@ int yydebug=1;
 %x pfheights
 %x includes
 %x collision
-%%    
+%%
 [ \t]+ putchar(' ');
 [ \t\r]+$
 
@@ -49,7 +55,7 @@ int yydebug=1;
 <asm>"\n" {linenumber++;printf("\n");}
 
 "sdata" {printf("%s",yytext);BEGIN(sdata);}
-<sdata>"=" printf(" %s ", yytext);  
+<sdata>"=" printf(" %s ", yytext);
 <sdata>[ \t]+ putchar(' ');
 <sdata>^"\nend" printf("%s",yytext);
 <sdata>"\nend" {linenumber++;printf("\nend");BEGIN(INITIAL);}
@@ -121,36 +127,36 @@ int yydebug=1;
 
 ".asm" printf("%s",yytext);
 "extra"[0-9]+: printf("%s",yytext);
-"step"[ ]+"-" printf("step -",yytext);
-"#"            printf("%s", yytext);  
-"$"            printf("%s", yytext);  
-"%"            printf("%s", yytext);  
-"["            printf("%s", yytext);  
-"]"            printf("%s", yytext);  
-"!"            printf("%s", yytext);  
-"."            printf("%s", yytext);  
-"_"            printf("%s", yytext);  
-"{"          printf("%s", yytext);  
-"}"          printf("%s", yytext);  
+"step"[ ]+"-" printf("step - %s",yytext);
+"#"            printf("%s", yytext);
+"$"            printf("%s", yytext);
+"%"            printf("%s", yytext);
+"["            printf("%s", yytext);
+"]"            printf("%s", yytext);
+"!"            printf("%s", yytext);
+"."            printf("%s", yytext);
+"_"            printf("%s", yytext);
+"{"          printf("%s", yytext);
+"}"          printf("%s", yytext);
 
 
-","            printf(" %s ", yytext);  
-"("            printf(" %s ", yytext);  
-")"            printf(" %s ", yytext);  
-">="            printf(" %s ", yytext);  
-"<="            printf(" %s ", yytext);  
-"="            printf(" %s ", yytext);  
-"<>"            printf(" %s ", yytext);  
-"<"            printf(" %s ", yytext);  
-"+"            printf(" %s ", yytext);  
-"-"            printf(" %s ", yytext);  
-"/"+            printf(" %s ", yytext);  
-"*"+            printf(" %s ", yytext);  
-">"            printf(" %s ", yytext);  
-":"            printf(" %s ", yytext);  
-"&"+          printf(" %s ", yytext);  
-"|"+          printf(" %s ", yytext);  
-"^"          printf(" %s ", yytext);  
+","            printf(" %s ", yytext);
+"("            printf(" %s ", yytext);
+")"            printf(" %s ", yytext);
+">="            printf(" %s ", yytext);
+"<="            printf(" %s ", yytext);
+"="            printf(" %s ", yytext);
+"<>"            printf(" %s ", yytext);
+"<"            printf(" %s ", yytext);
+"+"            printf(" %s ", yytext);
+"-"            printf(" %s ", yytext);
+"/"+            printf(" %s ", yytext);
+"*"+            printf(" %s ", yytext);
+">"            printf(" %s ", yytext);
+":"            printf(" %s ", yytext);
+"&"+          printf(" %s ", yytext);
+"|"+          printf(" %s ", yytext);
+"^"          printf(" %s ", yytext);
 
 [A-Z]+ printf("%s",yytext);
 [a-z]+       {       printf("%s", yytext);}
@@ -158,5 +164,5 @@ int yydebug=1;
 [\n] {printf("\n"); linenumber++;}
 .               {fprintf(stderr,"(%d) Parse error: unrecognized character \"%s\"\n",linenumber,yytext);  exit(1);}
 %%
-  int yywrap(void) {      return 1;  } 
-main(){yylex();}
+  int yywrap(void) {      return 1;  }
+int main(){yylex();}

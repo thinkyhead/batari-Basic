@@ -1,7 +1,11 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
-
-#ifndef KEYWORDS_H
-#define KEYWORDS_H
+/**
+ * keywords.h
+ * Entry-point for individual Batari Basic statement conversion.
+ *
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
+#ifndef _KEYWORDS_H_
+#define _KEYWORDS_H_
 
 char includespath[500];
 int ongosub;
@@ -53,4 +57,4 @@ int doingfunction;
 char Areg[50];
 int branchtargetnumber;
 
-#endif
+#endif // _KEYWORDS_H_

@@ -11,18 +11,39 @@
 BOOL includesfile_already_done = false;
 int decimal = 0;
 
+/**
+ * @brief      Get a '#' token if the value is immediate
+ *
+ * @param      value  The value
+ *
+ * @return     Pointer to "#" or "" string
+ */
 char* immedtok(char *value) { return isimmed(value) ? "#" : ""; }
 
+/**
+ * @brief      Get the index part of an address
+ *
+ * @param      mystatement  The statement to parse for an index
+ * @param[in]  myindex      Flag indicating there is an index part
+ *
+ * @return     The given statement with the index added
+ */
 char* indexpart(char *mystatement, int myindex) {
   static char outstr[50];
-  if (!myindex)
-    sprintf(outstr, "%s%s", immedtok(mystatement), mystatement);
+  if (myindex)
+    sprintf(outstr, "%s,x", mystatement); // An address indexed with x!
   else
-    sprintf(outstr, "%s,x", mystatement); // indexed with x!
+    sprintf(outstr, "%s%s", immedtok(mystatement), mystatement);
   return outstr;
 }
 
-// The fractional part of a declared 8.8 fixpoint variable
+/**
+ * @brief      Get the fractional part of a declared 8.8 fixpoint variable
+ *
+ * @param      item  The item to scan
+ *
+ * @return     A string containing the fractional part
+ */
 char* fracpart(char *item) {
   static char outstr[50];
   for (int i = 0; i < numfixpoint88; ++i) {
@@ -30,7 +51,7 @@ char* fracpart(char *item) {
     if (!strcmp(fixpoint88[0][i], item)) return outstr;
   }
   // must be immediate value
-  if (findpoint(item) < 50)
+  if (findpoint(item))
     sprintf(outstr, "#%d", (int)(immed_fixpoint(item) * 256.0));
   else
     sprintf(outstr, "#0");
@@ -38,6 +59,12 @@ char* fracpart(char *item) {
   return outstr;
 }
 
+/**
+ * @brief      Helper to print assembler code
+ *
+ * @param[in]  format     The format string
+ * @param[in]  <unnamed>  Optional additional parameters
+ */
 void asm_printf(const char* format, ...) {
   va_list args;
   va_start(args, format);
@@ -47,6 +74,11 @@ void asm_printf(const char* format, ...) {
 #define a(ASM) "\t" ASM "\n"
 #define ap(ASM, ...) asm_printf(a(ASM), ##__VA_ARGS__)
 
+/**
+ * @brief      Print a message about a found file
+ *
+ * @param      foundfile  The found file
+ */
 void currdir_foundmsg(char *foundfile) {
 	fprintf(stderr, "User-defined %s found in the current directory\n", foundfile);
 }
@@ -73,7 +105,8 @@ void pfclear(char **statement) {
 
 	invalidate_Areg();
 
-	if (bs == 28) {
+	// Bankswitching type 28
+	if (bs == BS_DPC_PLUS) {
 		ap("LDA #<C_function");
 		ap("STA DF0LOW");
 		ap("LDA #(>C_function) & $0F");
@@ -89,7 +122,7 @@ void pfclear(char **statement) {
 		if (index) loadindex(&getindex0[0]);
 		ap("LDA %s", indexpart(statement[2], index));
 	}
-	if (bs == 28) {             // DPC+
+	if (bs == BS_DPC_PLUS) {	// DPC+
 		ap("STA DF0WRITE");
 		ap("LDA #255");
 		ap("STA CALLFUNCTION");
@@ -821,7 +854,7 @@ void newbank(int bankno) {
 	else
 		printf(" ORG $%dFF4-bscode_length\n", bank - 1);
 
-	if (bs == 28)
+	if (bs == BS_DPC_PLUS)
 		printf(" RORG $%XF4-bscode_length\n", (2 * (bank - 1) - 1) * 16 + 15);
 	else if (bs == 64)
 		printf(" RORG $%XE0-bscode_length\n", (31 - bs / 2 + 2 * (bank - 1)) * 16 + 15);
@@ -837,7 +870,7 @@ void newbank(int bankno) {
 
 	printf(" ORG $%1XFFC\n", bank - 1);
 
-	if (bs == 28)
+	if (bs == BS_DPC_PLUS)
 		printf(" RORG $%XFC\n", (2 * (bank - 1) - 1) * 16 + 15);
 	else if (bs == 64)
 		printf(" RORG $%XFC\n", (31 - bs / 2 + 2 * (bank - 1)) * 16 + 15);
@@ -849,7 +882,7 @@ void newbank(int bankno) {
 
 	// now end
 	printf(" ORG $%1X000\n", bank);
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		printf(" RORG $%X00\n", (2 * bank - 1) * 16);
 		switch (bank) {
 			case 2:         // probably a better way to do this!!!
@@ -892,37 +925,57 @@ void newbank(int bankno) {
 
 float immed_fixpoint(char *fixpointval) {
 	int i = findpoint(fixpointval);
-	if (i == 50) return 0;		// failsafe
+	if (!i) return 0;		// failsafe
+	--i;
 	char decimalpart[50];
 	fixpointval[i] = '\0';
 	sprintf(decimalpart, "0.%s", fixpointval + i + 1);
 	return atof(decimalpart);
 }
 
-int findpoint(char *item) {		// determine if fixed point var
+/**
+ * @brief      Find the index of the decimal point (.) in the given item.
+ *
+ * @param      item  The item
+ *
+ * @return     The index, or 50 if no decimal was found
+ */
+int findpoint(char *item) {
 	int i;
 	for (i = 0; i < 50; ++i) {
-		if (item[i] == '\0') return 50;
-		if (item[i] == '.') return i;
+		if (item[i] == '\0') break;
+		if (item[i] == '.') return i + 1;
 	}
-	return i;
+	return 0;
 }
 
-void freemem(char **statement) {
+/**
+ * @brief      Free the statements list
+ *
+ * @param      statement_table  The statement table address
+ */
+void freemem(char **statement_table) {
 	int i;
-	for (i = 0; i < 200; ++i) free(statement[i]);
-	free(statement);
+	for (i = 0; i < 200; ++i) free(statement_table[i]);
+	free(statement_table);
+	//*statement_table = NULL;
 }
 
+/**
+ * @brief      Determine if a variable is fixed point, and if so, what kind
+ *
+ * @param      item  The item
+ *
+ * @return     The type of fixed-point value, or zero if not fixed-point.
+ */
 int isfixpoint(char *item) {
-	// determines if a variable is fixed point, and if so, what kind
 	int i;
 	removeCR(item);
 	for (i = 0; i < numfixpoint88; ++i)
 		if (!strcmp(item, fixpoint88[0][i])) return 8;
 	for (i = 0; i < numfixpoint44; ++i)
 		if (!strcmp(item, fixpoint44[0][i])) return 4;
-	if (findpoint(item) < 50) return 12;
+	if (findpoint(item)) return 12;
 	return 0;
 }
 
@@ -930,8 +983,8 @@ void set_romsize(char *size) {
 	if (MATCH(size, "2k"))
 		strcpy(redefined_variables[numredefvars++], "ROM2k = 1");
 	else if (MATCH(size, "8k")) {
-		bs = 8;
-		last_bank = 2;
+		bs = BS_8K;
+		last_bank = bs / 4;
 		if (MATCH(size, "8kEB"))
 			strcpy(redefined_variables[numredefvars++], "bankswitch_hotspot = $083F");
 		else
@@ -947,8 +1000,8 @@ void set_romsize(char *size) {
 			create_includes("bankswitch.inc");
 	}
 	else if (MATCH(size, "16k")) {
-		bs = 16;
-		last_bank = 4;
+		bs = BS_16K;
+		last_bank = bs / 4;
 		strcpy(redefined_variables[numredefvars++], "bankswitch_hotspot = $1FF6");
 		strcpy(redefined_variables[numredefvars++], "bankswitch = 16");
 		strcpy(redefined_variables[numredefvars++], "bs_mask = 3");
@@ -961,8 +1014,8 @@ void set_romsize(char *size) {
 			create_includes("bankswitch.inc");
 	}
 	else if (MATCH(size, "32k")) {
-		bs = 32;
-		last_bank = 8;
+		bs = BS_32K;
+		last_bank = bs / 4;
 		strcpy(redefined_variables[numredefvars++], "bankswitch_hotspot = $1FF4");
 		strcpy(redefined_variables[numredefvars++], "bankswitch = 32");
 		strcpy(redefined_variables[numredefvars++], "bs_mask = 7");
@@ -977,8 +1030,8 @@ void set_romsize(char *size) {
 			create_includes("bankswitch.inc");
 	}
 	else if (MATCH(size, "64k")) {
-		bs = 64;
-		last_bank = 16;
+		bs = BS_64K;
+		last_bank = bs / 4;
 		strcpy(redefined_variables[numredefvars++], "bankswitch_hotspot = $1FE0");
 		strcpy(redefined_variables[numredefvars++], "bankswitch = 64");
 		strcpy(redefined_variables[numredefvars++], "bs_mask = 15");
@@ -1060,6 +1113,13 @@ void barf_sprite_data() {
 	}
 }
 
+/**
+ * @brief      Create the 'includes.bB' file to be used later by 'postprocess'.
+ *             The file created here defines the active kernel, which is either:
+ *             Superchip, Bankswitch, or DPC Plus.
+ *
+ * @param      includesfile  The includesfile to use for input
+ */
 void create_includes(char *includesfile) {
 	FILE *includesread, *includeswrite;
 	char dline[500];
@@ -1109,32 +1169,52 @@ void create_includes(char *includesfile) {
 	fclose(includeswrite);
 }
 
+/**
+ * @brief      Set the X register to some value
+ *
+ * @param      myindex  Pointer to the value string
+ */
 void loadindex(char *myindex) {
 	if (!MATCH(myindex, "TSX")) // Not TSX...
 		ap("LDX %s%s", immedtok(myindex), myindex);
 }
 
+/**
+ * @brief      Find the index part of a statement, which is in square braces.
+ *
+ * @param      mystatement  The statement to search
+ * @param      myindex      The index part of the string, between the braces.
+ *
+ * @return     The value 1 if an index was found
+ */
 int getindex(char *mystatement, char *myindex) {
 	int i, j, index = 0;
 	for (i = 0; i < 200; ++i) {
 		if (mystatement[i] == '\0') { i = 200; break; }
 		if (mystatement[i] == '[') { index = 1; break; }
 	}
-	if (i < 200) {
+	if (index) {
 		strcpy(myindex, mystatement + i + 1);
-		myindex[strlen(myindex) - 1] = '\0';
-		if (myindex[strlen(myindex) - 2] == ']') myindex[strlen(myindex) - 2] = '\0';
-		if (myindex[strlen(myindex) - 1] == ']') myindex[strlen(myindex) - 1] = '\0';
+		const int len = strlen(myindex);
+
+	    // Crudely remove closing brace (and ignore extra braces)
+		myindex[len - 1] = '\0';
+		if (myindex[len - 1] == ']') myindex[len - 1] = '\0';
+		if (myindex[len - 2] == ']') myindex[len - 2] = '\0';
 		for (j = i; j < 200; ++j) mystatement[j] = '\0';
 	}
 	return index;
 }
 
+/**
+ * @brief      Check to see if multiplying by a value can be optimized to save cycles
+ *
+ * @param[in]  value  The multiplicand TO check
+ *
+ * @return     A 1 is returned if optimization is possible
+ */
 int checkmul(int value) {
-	// check to see if value can be optimized to save cycles
-
 	if (!(value % 2)) return 1;
-
 	if (value < 11) return 1;		// always optimize these
 
 	while (value != 1) {
@@ -1149,16 +1229,27 @@ int checkmul(int value) {
 	return (value == 1) ? 1 : 0;
 }
 
+/**
+ * @brief      Check whether a value is a power of two. If not, standard div must be used.
+ *
+ * @param[in]  value  The value to check
+ *
+ * @return     A 1 is returned if the value is a pure power of 2.
+ */
 int checkdiv(int value) {
-	// check to see if value is a power of two - if not, run standard div routine
 	while (value != 1) {
-		if (value & 1) break;
+		if (value & 1) return 0; // Not 1 but also odd? Must be more than one bit.
 		value >>= 1;
 	}
-	return (value == 1) ? 1 : 0;
+	return 1;
 }
 
-
+/**
+ * @brief      Generate assember for a multiplication
+ *
+ * @param      statement  The statement table address
+ * @param[in]  bits       The number of bits to multiply
+ */
 void mul(char **statement, int bits) {
 	// this will attempt to output optimized code depending on the multiplicand
 	int multiplicand = atoi(statement[6]);
@@ -1699,7 +1790,8 @@ void dim(char **statement) {
 	char fixpointvar2[50];
 	// check for fixedpoint variables
 	i = findpoint(statement[4]);
-	if (i < 50) {
+	if (i) {
+		--i;
 		removeCR(statement[4]);
 		strcpy(fixpointvar2, statement[4]);
 		fixpointvar1 = fixpointvar2 + i + 1;
@@ -1812,7 +1904,7 @@ void pfread(char **statement) {
 
 	int index = getindex(statement[3], &getindex0[0]) | getindex(statement[4], &getindex1[0]) << 1;
 
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		ap("LDA #<C_function");
 		ap("STA DF0LOW");
 		ap("LDA #(>C_function) & $0F");
@@ -1824,7 +1916,7 @@ void pfread(char **statement) {
 	if (index & 1) loadindex(&getindex0[0]);
 
 	ap("LDA %s", indexpart(statement[4], index & 1));
-	if (bs == 28) ap("STA DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STA DF0WRITE");
 
 	if (index & 2) loadindex(&getindex1[0]);
 
@@ -1853,7 +1945,7 @@ void pfpixel(char **statement) {
 	index |= getindex(statement[2], &getindex0[0]);
 	index |= getindex(statement[3], &getindex1[0]) << 1;
 
-	if (bs == 28) {		// DPC+
+	if (bs == BS_DPC_PLUS) {		// DPC+
 		ap("LDA #<C_function");
 		ap("STA DF0LOW");
 		ap("LDA #(>C_function) & $0F");
@@ -1862,21 +1954,21 @@ void pfpixel(char **statement) {
 
 	if      (!strncmp(statement[4], "flip", 2))	on_off_flip = 2; // Allow 'fl'
 	else if (!strncmp(statement[4], "off", 2))	on_off_flip = 1; // Allow 'of'
-	ap("LDX #%d", on_off_flip | (bs == 28 ? 12 : 0));
-	if (bs == 28) {
+	ap("LDX #%d", on_off_flip | (bs == BS_DPC_PLUS ? 12 : 0));
+	if (bs == BS_DPC_PLUS) {
 		ap("STX DF0WRITE");
 		ap("STX DF0WRITE");
 	}
 
 	if (index & 2) loadindex(&getindex1[0]);
 	ap("LDY %s", indexpart(statement[3], index & 2));
-	if (bs == 28) ap("STY DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STY DF0WRITE");
 
 	if (index & 1) loadindex(&getindex0[0]);
 	ap("LDA %s", indexpart(statement[2], index & 1));
-	if (bs == 28) ap("STA DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STA DF0WRITE");
 
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		ap("LDA #255");
 		ap("STA CALLFUNCTION");
 	}
@@ -1897,7 +1989,7 @@ void pfhline(char **statement) {
 
 	invalidate_Areg();
 
-	if (bs == 28) { // DPC+
+	if (bs == BS_DPC_PLUS) { // DPC+
 		ap("LDA #<C_function");
 		ap("STA DF0LOW");
 		ap("LDA #(>C_function) & $0F");
@@ -1910,22 +2002,22 @@ void pfhline(char **statement) {
 
 	if      (!strncmp(statement[4], "flip", 2))	on_off_flip = 2; // Allow 'fl'
 	else if (!strncmp(statement[4], "off", 2))	on_off_flip = 1; // Allow 'of'
-	ap("LDX #%d", on_off_flip | (bs == 28 ? 8 : 0));
-	if (bs == 28) ap("STX DF0WRITE");
+	ap("LDX #%d", on_off_flip | (bs == BS_DPC_PLUS ? 8 : 0));
+	if (bs == BS_DPC_PLUS) ap("STX DF0WRITE");
 
 	if (index & 4) loadindex(&getindex2[0]);
 	ap("LDA %s", indexpart(statement[4], index & 4));
-	ap("STA %s", bs == 28 ? "DF0WRITE" : "temp3");
+	ap("STA %s", bs == BS_DPC_PLUS ? "DF0WRITE" : "temp3");
 
 	if (index & 2) loadindex(&getindex1[0]);
 	ap("LDY %s", indexpart(statement[3], index & 2));
-	if (bs == 28) ap("STY DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STY DF0WRITE");
 
 	if (index & 1) loadindex(&getindex0[0]);
 	ap("LDA %s", indexpart(statement[2], index & 1));
-	if (bs == 28) ap("STA DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STA DF0WRITE");
 
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		ap("STA DF0WRITE");
 		ap("LDA #255");
 		ap("STA CALLFUNCTION");
@@ -1947,7 +2039,7 @@ void pfvline(char **statement) {
 
 	invalidate_Areg();
 
-	if (bs == 28) {		// DPC+
+	if (bs == BS_DPC_PLUS) {		// DPC+
 		ap("LDA #<C_function");
 		ap("STA DF0LOW");
 		ap("LDA #(>C_function) & $0F");
@@ -1960,22 +2052,22 @@ void pfvline(char **statement) {
 
 	if      (!strncmp(statement[4], "flip", 2))	on_off_flip = 2; // Allow 'fl'
 	else if (!strncmp(statement[4], "off", 2))	on_off_flip = 1; // Allow 'of'
-	ap("LDX #%d", on_off_flip | (bs == 28 ? 4 : 0));
-	if (bs == 28) ap("STX DF0WRITE");
+	ap("LDX #%d", on_off_flip | (bs == BS_DPC_PLUS ? 4 : 0));
+	if (bs == BS_DPC_PLUS) ap("STX DF0WRITE");
 
 	if (index & 4) loadindex(&getindex2[0]);
 	ap("LDA %s", indexpart(statement[4], index & 4));
-	ap("STA %s", bs == 28 ? "DF0WRITE" : "temp3");
+	ap("STA %s", bs == BS_DPC_PLUS ? "DF0WRITE" : "temp3");
 
 	if (index & 2) loadindex(&getindex1[0]);
 	ap("LDY %s", indexpart(statement[3], index & 2));
-	if (bs == 28) ap("STY DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STY DF0WRITE");
 
 	if (index & 1) loadindex(&getindex0[0]);
 	ap("LDA %s", indexpart(statement[2], index & 1));
-	if (bs == 28) ap("STA DF0WRITE");
+	if (bs == BS_DPC_PLUS) ap("STA DF0WRITE");
 
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		ap("LDA #255");
 		ap("STA CALLFUNCTION");
 	}
@@ -1985,7 +2077,7 @@ void pfvline(char **statement) {
 
 void pfscroll(char **statement) {
 	invalidate_Areg();
-	if (bs == 28) {
+	if (bs == BS_DPC_PLUS) {
 		//DPC+ version of function uses the syntax: pfscroll #LINES [start queue#] [end queue#]
 		if (SMATCH(2, "up") || SMATCH(2, "down") || SMATCH(2, "right") || SMATCH(2, "left")) {
 			fprintf(stderr, "(%d) pfscroll for DPC+ doesn't use up/down/left/right. try a value or variable instead.\n", line);
@@ -2483,7 +2575,7 @@ void doif(char **statement) {
 	if (SMATCH(2, "collision(")) {
 		if (   SMATCH(2, "collision(player")
 			&& (MATCH(statement[2] + 17, ",player") || MATCH(statement[2] + 17, ",_player"))
-			&& bs == 28
+			&& bs == BS_DPC_PLUS
 		) {
 			// DPC+ custom collision
 			if (statement[2][16] + statement[2][24] != '0' + '1') {
@@ -3354,7 +3446,7 @@ void dolet(char **cstatement) {
 			ap("EOR rand16");
 			printf(" endif\n");
 		}
-		else if (bs == 28)
+		else if (bs == BS_DPC_PLUS)
 			ap("LDA rand");
 		else
 			jsr("randomize");
@@ -3627,7 +3719,7 @@ void dolet(char **cstatement) {
 			}
 			if (fixpoint2 == 4)
 				ap("LDA %s", statement[4]);
-			if ((!isimmed(statement[6])) || (!checkmul(atoi(statement[6])))) {
+			if (!isimmed(statement[6]) || !checkmul(atoi(statement[6]))) {
 				displayoperation("*LDY", statement[6], index & 4);
 				if (statement[5][1] == '*')
 					jsrbank1("mul16");	// general mul routine
@@ -3870,7 +3962,7 @@ void set(char **statement) {
 		if (SMATCH(3, "none"))								optimization = 0;
 	}
 	else if (SMATCH(2, "kernal")) {
-		prerror("The proper spelling is \"kernel.\"  With an e.  Please make a note of this to save yourself from further embarassment.\n");
+		prerror("This isn't a C64. Did you mean \"kernel\"?\n");
 	}
 	else if (SMATCH(2, "kernel_options")) {
 		i = 3;
@@ -3879,15 +3971,15 @@ void set(char **statement) {
 			   && ((unsigned char) statement[i][0] < (unsigned char) 123)) {
 			if (SMATCH(i, "readpaddle")) {
 				strcpy(redefined_variables[numredefvars++], "readpaddle = 1");
-				if (bs == 28) {
+				if (bs == BS_DPC_PLUS) {
 					printf("DPC_kernel_options = INPT0+$40\n");
 					return;
 				}
 				else
-					kernel_options |= 1;
+					kernel_options |= 1;  //
 			}
 			else if (SMATCH(i, "collision")) {
-				if (bs == 28) {
+				if (bs == BS_DPC_PLUS) {
 					printf("DPC_kernel_options = ");
 					if (check_colls(statement[i]) == 7) printf("+$40");
 					printf("\n");
@@ -3901,21 +3993,21 @@ void set(char **statement) {
 			else if (SMATCH(i, "playercolors")) {
 				strcpy(redefined_variables[numredefvars++], "playercolors = 1");
 				strcpy(redefined_variables[numredefvars++], "player1colors = 1");
-				kernel_options |= 6;
+				kernel_options |= 6; // Multi player colors
 			}
 			else if (SMATCH(i, "no_blank_lines")) {
 				strcpy(redefined_variables[numredefvars++], "no_blank_lines = 1");
-				kernel_options |= 8;
+				kernel_options |= 8; // No blank lines
 			}
 			else if (IMATCH(i, "pfcolors")) {
-				kernel_options |= 16;
+				kernel_options |= 16; // Playfield Colors
 			}
 			else if (IMATCH(i, "pfheights")) {
-				kernel_options |= 32;
+				kernel_options |= 32; // Playfield Heights
 			}
 			else if (IMATCH(i, "backgroundchange")) {
 				strcpy(redefined_variables[numredefvars++], "backgroundchange = 1");
-				kernel_options |= 64;
+				kernel_options |= 64; // Background Changing
 			}
 			else {
 				prerror("set kernel_options: Options unknown or invalid\n");
@@ -3923,11 +4015,11 @@ void set(char **statement) {
 			}
 			i++;
 		}
-		if ((kernel_options & 48) == 32)
+		if ((kernel_options & 48) == 32) // Playfield Heights but not Colors
 			strcpy(redefined_variables[numredefvars++], "PFheights = 1");
-		else if ((kernel_options & 48) == 16)
+		else if ((kernel_options & 48) == 16) // Playfield Colors but not Heights
 			strcpy(redefined_variables[numredefvars++], "PFcolors = 1");
-		else if ((kernel_options & 48) == 48)
+		else if ((kernel_options & 48) == 48) // Playfield Colors and Heights
 			strcpy(redefined_variables[numredefvars++], "PFcolorandheight = 1");
 		//fprintf(stderr,"%d\n",kernel_options);
 		// check for valid combinations
@@ -3956,7 +4048,7 @@ void set(char **statement) {
 			multisprite = 2;
 			strcpy(redefined_variables[numredefvars++], "multisprite = 2");
 			create_includes("DPCplus.inc");
-			bs = 28;
+			bs = BS_DPC_PLUS;
 			last_bank = 7;
 			strcpy(redefined_variables[numredefvars++], "bankswitch_hotspot = $1FF6");
 			strcpy(redefined_variables[numredefvars++], "bankswitch = 28");
@@ -3988,50 +4080,74 @@ void set(char **statement) {
 
 }
 
+/**
+ * @brief      Check a remark statement for 'smartbranching'
+ *             Otherwise a remark puts nothing into the assembly code
+ *             This could be altered to generate an assembly comment
+ *
+ * @param      statement  The statement
+ */
 void rem(char **statement) {
 	if (SMATCH(2, "smartbranching"))
 		smartbranching = SMATCH(3, "on") ? 1 : 0;
 }
 
-void dopop() {
-	ap("PLA");
-	ap("PLA");
-}
+/**
+ * @brief      Two PLA will pop an address
+ */
+void dopop() { ap("PLA"); ap("PLA"); }
 
-void hotspotcheck(char *linenumber) {
+/**
+ * @brief      Check for a line number being too close to a bank switch hotspot
+ *
+ * @param      linenum  The linenum
+ */
+void hotspotcheck(char *linenum) {
 	if (bs) {	//if bankswitching, check for reverse branches from $1fXX that trigger hotspots...
-		printf(" if ( (((((#>*)&$1f)*256)|(#<.%s))>=bankswitch_hotspot) && (((((#>*)&$1f)*256)|(#<.%s))<=(bankswitch_hotspot+bs_mask)) )\n", linenumber, linenumber);
+		printf(" if ( (((((#>*)&$1f)*256)|(#<.%s))>=bankswitch_hotspot) && (((((#>*)&$1f)*256)|(#<.%s))<=(bankswitch_hotspot+bs_mask)) )\n", linenum, linenum);
 		printf("   echo \"WARNING: branch near the end of bank %d may accidentally trigger a bankswitch. Reposition code there if bad things happen.\"\n", bank);
 		printf(" endif\n");
 	}
 }
 
-void _branch(char *b1, char *b2, char *linenumber) {
-	removeCR(linenumber);
+/**
+ * @brief      Generate assembly for a branch, using a jump for long branches.
+ *
+ * @param      b1       Branch mnemonic for a true result
+ * @param      b2       Branch mnemonic for a false result (or long branch)
+ * @param      linenum  The line number where the branch needs to go
+ */
+void _branch(char *b1, char *b2, char *linenum) {
+	removeCR(linenum);
 	if (smartbranching) {
-		printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n", linenumber, linenumber);
+		printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n", linenum, linenum);
 		// branches might be allowed as below - check carefully to make sure!
-		// printf(" if ((* - .%s) < 127) && ((* - .%s) > -129)\n\tBMI .%s\n",linenumber,linenumber,linenumber);
-		ap("%s .%s", b1, linenumber);
+		// printf(" if ((* - .%s) < 127) && ((* - .%s) > -129)\n\tBMI .%s\n",linenum,linenum,linenum);
+		ap("%s .%s", b1, linenum);
 		printf(" else\n");
-		ap("%s .%dskip%s", b2, branchtargetnumber, linenumber);
-		ap("JMP .%s", linenumber);
-		printf(".%dskip%s\n", branchtargetnumber++, linenumber);
+		ap("%s .%dskip%s", b2, branchtargetnumber, linenum);
+		ap("JMP .%s", linenum);
+		printf(".%dskip%s\n", branchtargetnumber++, linenum);
 		printf(" endif\n");
 	}
 	else {
-		ap("%s .%s", b1, linenumber);
-		hotspotcheck(linenumber);
+		ap("%s .%s", b1, linenum);
+		hotspotcheck(linenum);
 	}
 }
-void bmi(char *linenumber) { _branch("BMI", "BPL", linenumber); }
-void bpl(char *linenumber) { _branch("BPL", "BMI", linenumber); }
-void bne(char *linenumber) { _branch("BNE", "BEQ", linenumber); }
-void beq(char *linenumber) { _branch("BEQ", "BNE", linenumber); }
-void bcc(char *linenumber) { _branch("BCC", "BCS", linenumber); }
-void bcs(char *linenumber) { _branch("BCS", "BCC", linenumber); }
-void bvc(char *linenumber) { _branch("BVC", "BVS", linenumber); }
-void bvs(char *linenumber) { _branch("BVS", "BVC", linenumber); }
+/**
+ * @brief      Branch helpers
+ *
+ * @param      linenum  The branch to generate
+ */
+void bmi(char *linenum) { _branch("BMI", "BPL", linenum); }
+void bpl(char *linenum) { _branch("BPL", "BMI", linenum); }
+void bne(char *linenum) { _branch("BNE", "BEQ", linenum); }
+void beq(char *linenum) { _branch("BEQ", "BNE", linenum); }
+void bcc(char *linenum) { _branch("BCC", "BCS", linenum); }
+void bcs(char *linenum) { _branch("BCS", "BCC", linenum); }
+void bvc(char *linenum) { _branch("BVC", "BVS", linenum); }
+void bvs(char *linenum) { _branch("BVS", "BVC", linenum); }
 
 void drawscreen() {
 	invalidate_Areg();
@@ -4041,8 +4157,20 @@ void drawscreen() {
 		jsr("drawscreen");
 }
 
+/**
+ * @brief      Print a message to the standard error output
+ *
+ * @param      myerror  The error message to print
+ */
 void prerror(char *myerror) { fprintf(stderr, "(%d): %s\n", line, myerror); }
 
+/**
+ * @brief      Test a string to see if it's an immediate value
+ *
+ * @param      value  Pointer to the value string
+ *
+ * @return     true if the value should be considered immediate
+ */
 BOOL isimmed(char *value) {
 	// search queue of constants
 	// removeCR(value);
@@ -4063,29 +4191,55 @@ BOOL isimmed(char *value) {
 	return value[0] == '$' || value[0] == '%' || ISNUM(value[0]);
 }
 
+/**
+ * @brief      Get the numeric value of a digit character
+ *
+ * @param[in]  value  The digit character '0' through '9'
+ *
+ * @return     The digit value, from 0 to 9
+ */
 int number(unsigned char value) { return ((int) value) - '0'; }
 
-// Remove trailing CR from string
-void removeCR(char *linenumber) {
-	while (linenumber[strlen(linenumber) - 1] == '\n' || linenumber[strlen(linenumber) - 1] == '\r')
-		linenumber[strlen(linenumber) - 1] = '\0';
+/**
+ * @brief      Replace all trailing CR/LF in a string with nul
+ *
+ * @param      line The string to clean
+ */
+void removeCR(char *line) {
+	int len;
+	while ((len = strlen(line)) && line[len - 1] == '\n' || line[len - 1] == '\r')
+		line[len - 1] = '\0';
 }
 
-void remove_trailing_commas(char *linenumber) {	// remove trailing commas from string
-	int i;
-	for (i = strlen(linenumber) - 1; i > 0; i--) {
-		if (   linenumber[i] != ','
-			&& linenumber[i] != ' '
-			&& linenumber[i] != '\n'
-			&& linenumber[i] != '\r'
+/**
+ * @brief      Replace a trailing comma with space. Trailing spaces, newlines are kept.
+ *
+ * @param      line  The string to clean
+ */
+void remove_trailing_commas(char *line) {	// remove trailing commas from string
+	for (int i = strlen(line) - 1; i > 0; i--) {
+		if (line[i] == ',') { line[i] = ' '; break; }
+		if (   line[i] != ' '
+			&& line[i] != '\n'
+			&& line[i] != '\r'
 		) break;
-		if (linenumber[i] == ',') { linenumber[i] = ' '; break; }
 	}
 }
 
+/**
+ * @brief      Open a header file. (Not Implemented)
+ *
+ * @param      header  Pointer to the header file struct
+ */
 void header_open(FILE * header) {
 }
 
+/**
+ * @brief      Open and write a header file with redefined variables
+ *
+ * @param      header    Pointer to the header file struct
+ * @param      filename  The filename to write
+ */
 void header_write(FILE * header, char *filename) {
 	int i;
 	if ((header = fopen(filename, "w")) == NULL) { // open file

@@ -5,7 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
-// This reads the includes file created by bB and builds the
+#include "macros.h"
+
+// Read the includes.bB file created by bB and build the
 // final assembly that will be sent to DASM.
 //
 // This task used to be done with a batch file/shell script when

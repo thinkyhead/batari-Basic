@@ -1,5 +1,10 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
-
+/**
+ * 2600bas.c
+ * Compile Batari Basic into Assembler suitable for compilation
+ * by dasm and execution in an Atari 2600 system or emulation.
+ *
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,16 +186,16 @@ int main(int argc, char *argv[]) {
 	barf_sprite_data();
 
 	printf(" if ECHOFIRST\n");
-	if (bs == 28)
+	if (bs == BS_DPC_PLUS)
 		printf("       echo \"    \",[(DPC_graphics_end - *)]d , \"bytes of ROM space left");
 	else
 		printf("       echo \"    \",[(scoretable - *)]d , \"bytes of ROM space left");
 	switch (bs) {
-		case 8: printf(" in bank 2"); break;
-		case 16: printf(" in bank 4"); break;
-		case 28: printf(" in graphics bank"); break;
-		case 32: printf(" in bank 8"); break;
-		case 64: printf(" in bank 16"); break;
+		case BS_8K:
+		case BS_16K:
+		case BS_32K:
+		case BS_64K: printf(" in bank %d", bs / 4); break;
+		case BS_DPC_PLUS: printf(" in graphics bank"); break;
 	}
 	printf(
 		"\")\n"
