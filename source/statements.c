@@ -71,6 +71,14 @@ void asm_printf(const char* format, ...) {
   vprintf(format, args);
   va_end(args);
 }
+
+/**
+ * @brief      { function_description }
+ *
+ * @param      ASM   The asm
+ *
+ * @return     { description_of_the_return_value }
+ */
 #define a(ASM) "\t" ASM "\n"
 #define ap(ASM, ...) asm_printf(a(ASM), ##__VA_ARGS__)
 
@@ -83,15 +91,26 @@ void currdir_foundmsg(char *foundfile) {
 	fprintf(stderr, "User-defined %s found in the current directory\n", foundfile);
 }
 
+/**
+ * @brief      { function_description }
+ */
 void doreboot() {
 	ap("JMP ($FFFC)");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 int linenum() {
 	// returns current line number in source
 	return line;
 }
 
+/**
+ * @brief      { function_description }
+ */
 void vblank() {
 	// code that will be run in the vblank area
 	// subject to limitations!
@@ -99,6 +118,11 @@ void vblank() {
 	printf("vblank_bB_code\n");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfclear(char **statement) {
 	char getindex0[200];
 	int index = 0;
@@ -134,6 +158,11 @@ void pfclear(char **statement) {
 
 }
 
+/**
+ * @brief      Does a push.
+ *
+ * @param      statement  The statement
+ */
 void do_push(char **statement) {
 	int k, i = 2;
 	// syntax: push [vars]
@@ -159,6 +188,11 @@ void do_push(char **statement) {
 
 }
 
+/**
+ * @brief      Does a pull.
+ *
+ * @param      statement  The statement
+ */
 void do_pull(char **statement) {
 	int k, i = 2;
 	int savei;
@@ -189,6 +223,11 @@ void do_pull(char **statement) {
 
 }
 
+/**
+ * @brief      Does a stack.
+ *
+ * @param      statement  The statement
+ */
 void do_stack(char **statement) {
 	removeCR(statement[2]);
 	ap("LDA #<(STACKbegin+%s)", statement[2]);
@@ -197,6 +236,11 @@ void do_stack(char **statement) {
 	ap("STA DF7HI");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void bkcolors(char **statement) {
 	char data[200];
 	char label[200];
@@ -240,6 +284,11 @@ void bkcolors(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void playfieldcolorandheight(char **statement) {
 	char data[200];
 	char rewritedata[200];
@@ -495,6 +544,11 @@ void playfieldcolorandheight(char **statement) {
 
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      location  The location
+ */
 void jsrbank1(char *location) {
 	// bankswitched jsr to bank 1
 	// determines whether to use the standard jsr (for 2k/4k or bankswitched stuff in current bank)
@@ -531,6 +585,11 @@ void jsrbank1(char *location) {
 	printf("ret_point%d\n", numjsrs);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void playfield(char **statement) {
 	// for specifying a ROM playfield
 	char zero = '.';
@@ -674,10 +733,25 @@ void playfield(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 int bbank() { return bank; }
 
+/**
+ * @brief      { function_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 int bbs() { return bs; }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      location  The location
+ */
 void jsr(char *location) {
 	// determines whether to use the standard jsr (for 2k/4k or bankswitched stuff in current bank)
 	// or to switch banks before calling the routine
@@ -711,6 +785,13 @@ void jsr(char *location) {
 	printf("ret_point%d\n", numjsrs);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      input_source  The input source
+ *
+ * @return     { description_of_the_return_value }
+ */
 int switchjoy(char *input_source) {
 	// place joystick/console switch reading code inline instead of as a subroutine
 	// standard routines needed for pretty much all games
@@ -799,6 +880,11 @@ int switchjoy(char *input_source) {
 	exit(1);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param[in]  bankno  The bankno
+ */
 void newbank(int bankno) {
 	FILE *bs_support;
 	char line[500];
@@ -923,6 +1009,13 @@ void newbank(int bankno) {
 	// do something I forgot
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      fixpointval  The fixpointval
+ *
+ * @return     { description_of_the_return_value }
+ */
 float immed_fixpoint(char *fixpointval) {
 	int i = findpoint(fixpointval);
 	if (!i) return 0;		// failsafe
@@ -979,6 +1072,11 @@ int isfixpoint(char *item) {
 	return 0;
 }
 
+/**
+ * @brief      Sets the romsize.
+ *
+ * @param      size  The size
+ */
 void set_romsize(char *size) {
 	if (MATCH(size, "2k"))
 		strcpy(redefined_variables[numredefvars++], "ROM2k = 1");
@@ -1048,16 +1146,31 @@ void set_romsize(char *size) {
 	}
 }
 
+/**
+ * @brief      Adds includes.
+ *
+ * @param      myinclude  The myinclude
+ */
 void add_includes(char *myinclude) {
 	if (includesfile_already_done)
 		fprintf(stderr, "%d: Warning: include ignored (includes should typically precede other commands)\n", line);
 	strcat(user_includes, myinclude);
 }
 
+/**
+ * @brief      Adds an inline.
+ *
+ * @param      myinclude  The myinclude
+ */
 void add_inline(char *myinclude) {
 	printf(" include %s\n", myinclude);
 }
 
+/**
+ * @brief      Initializes the includes.
+ *
+ * @param      path  The path
+ */
 void init_includes(char *path) {
 	if (path)
 		strcpy(includespath, path);
@@ -1066,6 +1179,9 @@ void init_includes(char *path) {
 	user_includes[0] = '\0';
 }
 
+/**
+ * @brief      { function_description }
+ */
 void barf_sprite_data() {
 	int i, j, k;
 	// go to the last bank before barfing the graphics
@@ -1361,6 +1477,12 @@ void mul(char **statement, int bits) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ * @param[in]  bits       The bits
+ */
 void divd(char **statement, int bits) {
 	int divisor = atoi(statement[6]);
 	if (bits == 16) {
@@ -1384,11 +1506,19 @@ void divd(char **statement, int bits) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ */
 void endfunction() {
 	if (!doingfunction) prerror("extraneous end keyword encountered\n");
 	doingfunction = 0;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void function(char **statement) {
 	// declares a function - only needed if function is in bB.  For asm functions, see
 	// the help.html file.
@@ -1399,6 +1529,11 @@ void function(char **statement) {
 	ap("STY temp2");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void callfunction(char **statement) {
 	// called by assignment to a variable
 	// does not work as an argument in another function or an if-then... yet.
@@ -1428,13 +1563,29 @@ void callfunction(char **statement) {
 	strcpy(Areg, "invalid");
 }
 
+/**
+ * @brief      { function_description }
+ */
 void incline() { line++; }
 
+/**
+ * @brief      { function_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 int bbgetline() { return line; }
 
+/**
+ * @brief      { function_description }
+ */
 void invalidate_Areg() { strcpy(Areg, "invalid"); }
 
 // Determine if the item after a "then" is a label or a statement
+//
+// @param      statement  The statement
+//
+// @return     { description_of_the_return_value }
+//
 BOOL islabel(char **statement) {
 	// return true=label, false=statement
 	int i;
@@ -1444,6 +1595,11 @@ BOOL islabel(char **statement) {
 }
 
 // Determine if the item after an "else" is a label or a statement
+//
+// @param      statement  The statement
+//
+// @return     { description_of_the_return_value }
+//
 BOOL islabelelse(char **statement) {
 	// return of true=label, false=statement
 	int i;
@@ -1452,6 +1608,14 @@ BOOL islabelelse(char **statement) {
 	return findlabel(statement, i);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ * @param[in]  i          { parameter_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 BOOL findlabel(char **statement, int i) {
 	char statementcache[100];
 	// true if label, false if not
@@ -1513,6 +1677,11 @@ BOOL findlabel(char **statement, int i) {
 	return true; // I really hope we've got a label !!!!
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void sread(char **statement) {
 	// read sequential data
 	ap("LDX #%s", statement[6]);
@@ -1523,6 +1692,11 @@ void sread(char **statement) {
 	strcpy(Areg, "invalid");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void sdata(char **statement) {
 	// sequential data, works like regular basics and doesn't have the 256 byte restriction
 	char data[200];
@@ -1555,6 +1729,11 @@ void sdata(char **statement) {
 	printf(".skip%s\n", statement[0]);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void data(char **statement) {
 	char data[200];
 	char **data_length;
@@ -1600,6 +1779,12 @@ void data(char **statement) {
 	freemem(deallocdata_length);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ * @param[in]  num        The number
+ */
 void shiftdata(char **statement, int num) {
 	int i, j;
 	for (i = 199; i > num; i--)
@@ -1607,6 +1792,13 @@ void shiftdata(char **statement, int num) {
 			statement[i][j] = statement[i - 1][j];
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ * @param[in]  num1       The number 1
+ * @param[in]  num2       The number 2
+ */
 void compressdata(char **statement, int num1, int num2) {
 	int i, j;
 	for (i = num1; i < 200 - num2; i++)
@@ -1614,6 +1806,11 @@ void compressdata(char **statement, int num1, int num2) {
 			statement[i][j] = statement[i + num2][j];
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void ongoto(char **statement) {
 	// warning!!! bankswitching not yet supported
 	int k, i = 4;
@@ -1653,6 +1850,11 @@ void ongoto(char **statement) {
 		printf("ongosub%d\n", ongosub++);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void dofor(char **statement) {
 	if (strcmp(statement[4], Areg)) {
 		ap("LDA %s%s", immedtok(statement[4]), statement[4]);
@@ -1680,6 +1882,11 @@ void dofor(char **statement) {
 	numfors++;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void next(char **statement) {
 	int immed = 0;
 	int immedend = 0;
@@ -1783,6 +1990,11 @@ void next(char **statement) {
 	if (failsafe) printf(".%s\n", failsafelabel);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void dim(char **statement) {
 	// just take the statement and pass it right to a header file
 	int i;
@@ -1815,6 +2027,11 @@ void dim(char **statement) {
 	numredefvars++;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void doconst(char **statement) {
 	// basically the same as dim, except we keep a queue of variable names that are constant
 	int i = 2;
@@ -1828,6 +2045,11 @@ void doconst(char **statement) {
 }
 
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void doreturn(char **statement) {
 	int index = 0;
 	char getindex0[200];
@@ -1896,6 +2118,11 @@ void doreturn(char **statement) {
 	ap("RTS");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfread(char **statement) {
 	char getindex0[200];
 	char getindex1[200];
@@ -1931,6 +2158,11 @@ void pfread(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfpixel(char **statement) {
 	char getindex0[200];
 	char getindex1[200];
@@ -1976,6 +2208,11 @@ void pfpixel(char **statement) {
 		jsr("pfpixel");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfhline(char **statement) {
 	char getindex0[200];
 	char getindex1[200];
@@ -2026,6 +2263,11 @@ void pfhline(char **statement) {
 		jsr("pfhline");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfvline(char **statement) {
 	char getindex0[200];
 	char getindex1[200];
@@ -2075,6 +2317,11 @@ void pfvline(char **statement) {
 		jsr("pfvline");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void pfscroll(char **statement) {
 	invalidate_Areg();
 	if (bs == BS_DPC_PLUS) {
@@ -2148,6 +2395,9 @@ void pfscroll(char **statement) {
 	jsr("pfscroll");
 }
 
+/**
+ * @brief      { function_description }
+ */
 void doasm() {
 	char data[200];
 	while (1) {
@@ -2161,6 +2411,11 @@ void doasm() {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void domacro(char **statement) {
 	int k, j = 1, i = 3;
 	macroactive = 1;
@@ -2178,6 +2433,11 @@ void domacro(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void callmacro(char **statement) {
 	int k, i = 3;
 	macroactive = 1;
@@ -2193,6 +2453,11 @@ void callmacro(char **statement) {
 	printf("\n");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      extrano  The extrano
+ */
 void doextra(char *extrano) {
 	extraactive = 1;
 	printf("extra set %d\n", ++extra);
@@ -2204,6 +2469,9 @@ void doextra(char *extrano) {
 	printf("\n");
 }
 
+/**
+ * @brief      { function_description }
+ */
 void doend() {
 	if (extraactive) {
 		printf(" ENDM\n");
@@ -2217,6 +2485,11 @@ void doend() {
 		prerror("extraneous end statement found");
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void player(char **statement) {
 	int height = 0, i = 0;      // calculating sprite height
 	int doingcolor = 0;         // doing player colors?
@@ -2348,6 +2621,11 @@ void player(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void lives(char **statement) {
 	int i = 0;
 	char label[200];
@@ -2384,6 +2662,13 @@ void lives(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ *
+ * @return     { description_of_the_return_value }
+ */
 int check_colls(char *statement) {
 	int bit;
 	if      (MATCH(statement, "collision(missile0,player1)"))	{ bit = 7; printf("CXM0P"); }
@@ -2422,6 +2707,11 @@ int check_colls(char *statement) {
 	return bit;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void scorecolors(char **statement) {
 	int i = 0;  //height can change
 	char data[200];
@@ -2446,6 +2736,11 @@ void scorecolors(char **statement) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void doif(char **statement) {
 	int index = 0;
 	int situation = 0;
@@ -3082,8 +3377,21 @@ void doif(char **statement) {
 	freemem(dealloccstatement);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @return     { description_of_the_return_value }
+ */
 int getcondpart() { return condpart; }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param[in]  op1   The operation 1
+ * @param[in]  op2   The operation 2
+ *
+ * @return     { description_of_the_return_value }
+ */
 int orderofoperations(char op1, char op2) {
 	// specify order of operations for complex equations
 	// i.e.: parens, divmul (*/), +-, logical (^&|)
@@ -3105,10 +3413,24 @@ int orderofoperations(char op1, char op2) {
 	return 1;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param[in]  op    The operation
+ *
+ * @return     { description_of_the_return_value }
+ */
 int isoperator(char op) {
 	return (strchr("+-/*&|^()", op) != NULL) ? 1 : 0;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      opcode   The opcode
+ * @param      operand  The operand
+ * @param[in]  index    The index
+ */
 void displayoperation(char *opcode, char *operand, int index) {
 	if (MATCH(operand, "stackpull")) {
 		if (opcode[0] == '-') {
@@ -3137,6 +3459,11 @@ void displayoperation(char *opcode, char *operand, int index) {
 	}
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      cstatement  The cstatement
+ */
 void dec(char **cstatement) {
 	decimal = 1;
 	ap("SED");
@@ -3145,6 +3472,11 @@ void dec(char **cstatement) {
 	decimal = 0;
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      cstatement  The cstatement
+ */
 void dolet(char **cstatement) {
 	int i, j = 0, bit = 0, k;
 	int index = 0;
@@ -3811,6 +4143,11 @@ void dolet(char **cstatement) {
 	free(deallocstatement);
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void dogoto(char **statement) {
 	int anotherbank = 0;
 	if (SMATCH(3, "bank")) {
@@ -3841,6 +4178,11 @@ void dogoto(char **statement) {
 	ap("JMP BS_jsr");    // also works for jmps
 }
 
+/**
+ * @brief      { function_description }
+ *
+ * @param      statement  The statement
+ */
 void gosub(char **statement) {
 	int anotherbank = 0;
 	invalidate_Areg();
@@ -3895,6 +4237,11 @@ void gosub(char **statement) {
 	printf("ret_point%d\n", numjsrs);
 }
 
+/**
+ * @brief      Generate Assembler for the 'set' statement
+ *
+ * @param      statement  The statement
+ */
 void set(char **statement) {
 	int i;
 	int v;
@@ -4149,6 +4496,9 @@ void bcs(char *linenum) { _branch("BCS", "BCC", linenum); }
 void bvc(char *linenum) { _branch("BVC", "BVS", linenum); }
 void bvs(char *linenum) { _branch("BVS", "BVC", linenum); }
 
+/**
+ * @brief      { function_description }
+ */
 void drawscreen() {
 	invalidate_Areg();
 	if (multisprite == 2)
