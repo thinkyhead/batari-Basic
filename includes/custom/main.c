@@ -18,7 +18,7 @@
  */
 
 /**
- * main.c
+ * includes/custom/main.c
  */
 
 // src/custom.h defines the following:
