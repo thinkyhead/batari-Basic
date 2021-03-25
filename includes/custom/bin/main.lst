@@ -49,7 +49,7 @@ ARM GAS  main.s 			page 1
   22:main.c        **** // double             = 64 bit, 8 bytes.  Not Supported#
   23:main.c        **** // *                  = 32 bit, 4 bytes, pointer (ie: char*, int*)
   24:main.c        **** //
-  25:main.c        **** // # - at least not supported with the compiler under OS X.  It might be supported by the Linux/Win
+  25:main.c        **** // # - at least not supported with the compiler under macOS.  It might be supported by the Linux/Win
   26:main.c        **** //     compiler - but support would be implemented via software as the ARM in the Harmony Cartridge
   27:main.c        **** //     have an FPU (floating point unit).  As such, performance will most likely be as good as usin
   28:main.c        **** //     integer math based routines.

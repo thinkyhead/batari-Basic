@@ -1,7 +1,10 @@
 @echo off
+
 if X"%bB%" == X goto nobb
+
 preprocess <"%~f1" | 2600basic.exe -i "%bB%" > bB.asm
 if errorlevel 1 goto bBerror
+
 if X%2 == X-O goto optimize
 postprocess -i "%bB%" > "%~f1.asm"
 goto nooptimize

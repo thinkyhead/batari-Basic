@@ -24,7 +24,7 @@
 // double             = 64 bit, 8 bytes.  Not Supported#
 // *                  = 32 bit, 4 bytes, pointer (ie: char*, int*)
 //
-// # - at least not supported with the compiler under OS X.  It might be supported by the Linux/Windows ARM
+// # - at least not supported with the compiler under macOS.  It might be supported by the Linux/Windows ARM
 //     compiler - but support would be implemented via software as the ARM in the Harmony Cartridge does not
 //     have an FPU (floating point unit).  As such, performance will most likely be as good as using
 //     integer math based routines.
