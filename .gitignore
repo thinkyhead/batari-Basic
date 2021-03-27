@@ -43,3 +43,9 @@
 source/build
 packages
 packages/*
+samples/*.asm
+samples/*.bin
+samples/*.lst
+samples/*.sym
+samples/*.bB
+samples/2600basic_variable_redefs.h
