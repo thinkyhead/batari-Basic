@@ -32,6 +32,9 @@
 
 #include <stdio.h>
 
+extern int bs; // bankswitching type; 0=none
+extern int bank;
+
 void doextra(char *);
 void callmacro(char **);
 void do_stack(char **);

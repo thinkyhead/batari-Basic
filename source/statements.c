@@ -28,8 +28,53 @@
 #include "statements.h"
 #include "keywords.h"
 
+int bs = 0; // bankswitching type; 0=none
+int bank = 1; // current bank: 1 or 2 for 8k
 int includesfile_already_done = 0;
-int decimal                   = 0;
+int decimal = 0;
+
+char includespath[500];
+int ongosub = 0;
+int condpart = 0;
+int ROMpf = 0;
+int smartbranching = 0;
+int superchip = 0;
+int last_bank = 0; // last bank when bs is enabled (0 for 2k/4k)
+int multisprite = 0;
+int lifekernel = 0;
+int numfors = 0;
+int numjsrs = 0;
+//int numgosubs = 0;
+int extra = 0;
+int extralabel = 0;
+int extraactive = 0;
+int macroactive = 0;
+char user_includes[1000];
+char sprite_data[5000][50];
+int sprite_index = 0;
+int playfield_index[50] = { 0 };
+int playfield_number = 0;
+int pfdata[50][256];
+char forvar[50][50];
+char forlabel[50][50];
+char forstep[50][50];
+char forend[50][50];
+char fixpoint44[2][50][50];
+char fixpoint88[2][50][50];
+char redefined_variables[500][100];
+char constants[500][100];
+int pfcolorindexsave;
+int pfcolornumber;
+int kernel_options;
+int numfixpoint44 = 0;
+int numfixpoint88 = 0;
+int numredefvars = 0;
+int optimization = 0;
+int numconstants = 0;
+int line = 0;
+int doingfunction = 0;
+char Areg[50];
+int branchtargetnumber = 0;
 
 void currdir_foundmsg(char *foundfile) {
   fprintf(stderr, "User-defined %s found in the current directory\n", foundfile);

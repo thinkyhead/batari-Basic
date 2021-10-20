@@ -29,6 +29,10 @@
 #include <unistd.h>
 #include <string.h>
 
+int ors = 0;
+int numthens = 0;
+int numelses = 0;
+
 int swaptest(char *value) { // check for then, && or ||
   return !strncmp(value, "then\0", 4) || !strncmp(value, "&&\0", 2) || !strncmp(value, "||\0", 2);
 }
