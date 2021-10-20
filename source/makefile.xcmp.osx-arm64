@@ -1,12 +1,14 @@
-# The bB Win64 cross compiling makefile.
+# The bB OS X cross compiling makefile. This is meant to be run from Linux
 #
 # See COMPILE.txt for details on how to setup the supporting environment
 #
 
-ARCH=.Windows.x64.exe
+#export PATH := /usr/arm64-apple-darwin10/bin:$(PATH)
+
+ARCH=.Darwin.arm64
 DEST=./build/
-CC=x86_64-w64-mingw32-gcc
-CFLAGS=-O2
+CC=arm64-apple-darwin10-gcc
+CFLAGS=-arch arm64 -m64 -O2
 LEX=lex
 LEXFLAGS=-t
 MKDIR=mkdir -p
