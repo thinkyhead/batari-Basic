@@ -14,27 +14,27 @@ Batari BASIC v1.6-SNAPSHOT - a Basic Compiler for the Atari 2600
 
 ____________________________________________________________________________
 
-batari Basic is free of charge and provided under the GPL v2 license. See 
+batari Basic is free of charge and provided under the GPL v2 license. See
 the included LICENSE.txt for more information.
 
 The license does not apply to Atari 2600 games created with Batari BASIC.
 You may license your games however you wish.  Many batari Basic games have
-been published, and are available for sale on cartridge.  
+been published, and are available for sale on cartridge.
 ____________________________________________________________________________
 
 
 WHAT IT IS:
 ___________
 
-batari Basic (bB) is a BASIC-like language for creating Atari 2600 games.  
+batari Basic (bB) is a BASIC-like language for creating Atari 2600 games.
 It is a compiled language that runs on a computer, and it creates a binary
-file that can be run on an Atari 2600 emulator or the binary file may be used 
+file that can be run on an Atari 2600 emulator or the binary file may be used
 to make a cartridge that will operate on a real Atari 2600.
 
 If you find any bugs, please report them via github.
 
 To learn how to use Batari Basic, please refer to the documentation found at:
- https://www.randomterrain.com/atari-2600-memories-batari-basic-commands.html 
+ https://www.randomterrain.com/atari-2600-memories-batari-basic-commands.html
 and the sample programs included in this release.
 
 ____________________________________________________________________________
@@ -67,7 +67,7 @@ variables to point at your batari basic directory.
 This is accomplished differently, depending on your version of Windows. This
 info is easily found on the Internet - https://tinyurl.com/yx756dug
 
-Once the above is done, switch to a folder containing a bB source file and 
+Once the above is done, switch to a folder containing a bB source file and
 type:
 
 	2600bas filename
@@ -75,28 +75,28 @@ type:
 where filename is the name of the BASIC source file you wish to compile. The
  project folder can be any folder you create to store your files.
 
-To test your installation, several sample programs are included in the 
+To test your installation, several sample programs are included in the
 "Samples" folder. Change directories to this location and type:
 
 	2600bas sample.bas
 
-If successful, a file called sample.bas.bin will be generated that you can 
-run on an emulator, or add to a flash cart. The sample program is not very 
-interesting, but note how simple it was to write. Open sample.bas in a text 
+If successful, a file called sample.bas.bin will be generated that you can
+run on an emulator, or add to a flash cart. The sample program is not very
+interesting, but note how simple it was to write. Open sample.bas in a text
 editor and take a look at how it was written.
 
 
 Getting Started with Linux/OS X/other Unixes
 ____________________________________________
 
-This version of batari Basic comes bundled with 32-bit and 64-bit binaries 
+This version of batari Basic comes bundled with 32-bit and 64-bit binaries
 for both OS X and Linux. If you wish to run batari Basic on a platform other
-than those ones, you'll need to rebuild the binaries. (Refer to the provided 
+than those ones, you'll need to rebuild the binaries. (Refer to the provided
 COMPILE.txt document)
 
-The rest of this section assumes you understand what directory you saved 
-the batari Basic zip file to, how to extract the zip file, how to open a 
-Unix shell, and how to use the "cd" command to move into in directories. 
+The rest of this section assumes you understand what directory you saved
+the batari Basic zip file to, how to extract the zip file, how to open a
+Unix shell, and how to use the "cd" command to move into in directories.
 
 
 batari Basic for Linux or OS X - the Easy Way
@@ -143,27 +143,27 @@ _____________
 Not unlike other compilers, batari BASIC uses a 4-step compilation process:
 
 1. Preprocess..._
-   The preprocessor takes your Basic code, and reformats and tokenizes it 
-   so the compiler can understand it.  Certain errors can be caught at this 
+   The preprocessor takes your Basic code, and reformats and tokenizes it
+   so the compiler can understand it.  Certain errors can be caught at this
    stage.
 
 2. Compile..._
-   The compiler converts your Basic code into assembly language.  It will 
-   create a temporary file called bB.asm.  The Basic code is preserved as 
+   The compiler converts your Basic code into assembly language.  It will
+   create a temporary file called bB.asm.  The Basic code is preserved as
    comments in this file so that those wishing to study assembly language
    can learn by studying how the Basic code was converted.
 
 3. Link...
-   The linker splits the Basic code into sections if needed, then 
-   concatenates them, along with the kernel, modules and compilation 
+   The linker splits the Basic code into sections if needed, then
+   concatenates them, along with the kernel, modules and compilation
    directives into a composite assembly language file.
 
 [3a. Optimize...]
-   An optional stage is a peephole optimizer that looks for redundant 
+   An optional stage is a peephole optimizer that looks for redundant
    and unnecessary code in the composite assembly file.
 
 4. Assemble...
-   The assembler converts assembly language to a binary file that contains 
+   The assembler converts assembly language to a binary file that contains
    machine code that can run on an emulator or a real Atari 2600.
 
 
@@ -183,33 +183,33 @@ Ininitally a fork-release, now official
  -adjusted symbol and list file names to allow easier import into stella.
  -added -v version output switch to 2600basic (2600bas.c)
  -added missing player1color: check to findlabel() in statements.c
- -updated 2600bas.c and statuements.c to remove first pass output of 
+ -updated 2600bas.c and statuements.c to remove first pass output of
   ROM space left.
- -updated branching handlers in statements.c to warn for last page 
+ -updated branching handlers in statements.c to warn for last page
   branch accidental hotspot triggering.
- -added necessary padding when pfheights table is used and near the 
+ -added necessary padding when pfheights table is used and near the
   start of a page. (statements.c)
  -fixed off-by-one mallocs in postprocess.c.
- -fixed **statement overrun in 2600bas.c when code has REM with long 
+ -fixed **statement overrun in 2600bas.c when code has REM with long
   horizontal separators.
  -increased **statement setup from 50x50 to 100x100 in 2600bas.c,
   to match some usage in statements.c and avoid overruns.
- -fixed DPC+ kernel screen garbling bug when not using 
+ -fixed DPC+ kernel screen garbling bug when not using
   "set kernel_options collision". (DPCplus_kernel.asm)
- -fixed DPC+ stack range pull. Pulling was restoring in reverse order to 
+ -fixed DPC+ stack range pull. Pulling was restoring in reverse order to
   pushing, and only pulling the first value. (statement.c)
- -fixed DPC+ variable list pull. Pulling was restoring in reverse order to 
+ -fixed DPC+ variable list pull. Pulling was restoring in reverse order to
   pushing, which batari described as broken. (statement.c)
  -fixed DPC+ COLUM0 color bug. (custom/main.c and DPCplus_kernel.asm)
  -fixed off-by-one bouncy-score bug. (std_kernel.asm)
  -removed variable references to other variables in multisprite.h, as that
   was causing dasm label shifting between passes.
  -added pfread for DPC+. (custom/main.c and statement.c)
- -added "tiny" font to font collection, by popular demand. 
+ -added "tiny" font to font collection, by popular demand.
   (score_graphics.asm and score_graphics.asm.tiny)
  -added "dec" command, to do "let" type addition or subtraction in decimal
   mode. (statements.c, statements.h, keywords.c, keywords.h
- -added scorefade constant into the standard kernel, to allow a 
+ -added scorefade constant into the standard kernel, to allow a
   gradient/colorbar effect. (std_kernel.asm)
  -fixed additional scanline issue in standard kernel when both "set tv pal"
   and "no_blank_lines" were used.
@@ -217,15 +217,15 @@ Ininitally a fork-release, now official
   statements, which enabled batari's existing player#-#color: code.
  -added DPC+ pfclear command. (custom/main.c, statements.c)
  -fixed DPC+ bug whereby a partially displayed virtual sprite at top of the
-  screen would prematurely end positioning for the other virtual sprites. 
+  screen would prematurely end positioning for the other virtual sprites.
   (custom/main.c)
  -fixed vertical wrapping of player0 in DPC+ kernel. (custom/main.c and
   DPCplus_kernel.asm)
  -fixed horizontal masking of reflected vsprites. (custom/main.c)
  -fixed pfscore timing in DPC+ pfscore code. (DPCplus_kernel.asm)
- -set COLUBK to 0 as part of DPC+ kernel, so the partial color wouldn't show 
+ -set COLUBK to 0 as part of DPC+ kernel, so the partial color wouldn't show
   up before the first line. (DPCplus_kernel.asm)
- -fixed multiplication by powers of two greater than 11 so they still use 
+ -fixed multiplication by powers of two greater than 11 so they still use
   shifting. (statement.c)
  -added makefiles for Linux, OS X, and Windows2. "make dist" with the default
   makefile will build bB binaries for all platforms, assuming you have cross
@@ -234,41 +234,41 @@ Ininitally a fork-release, now official
   in path of the bB variable.
  -added includes/indent.sh, a script to tidy 6502/7 assembly source. Used it
   on the standard and DPC+ kernel sources.
- -added documentation: ISSUES.txt, COMPILE.txt, README_UX.txt, and 
-  ARMCOMPILE.txt 
- -fixed the PF1 data glitch would show up beyond the last line. 
+ -added documentation: ISSUES.txt, COMPILE.txt, README_UX.txt, and
+  ARMCOMPILE.txt
+ -fixed the PF1 data glitch would show up beyond the last line.
   (DPCplus_kernel.asm)
  -squeezed DPC+ kernel for space, and then squeezed more (custom/main.c)
  -implemented pfscroll for DPC+. (statements.c, custom/main.c)
  -added collision(player0,_player1) for just detecting p0+p1 detection.
   (statements.c)
- -fixed cycle overage in the standard kernel that was corrupting the last 
+ -fixed cycle overage in the standard kernel that was corrupting the last
   line when scrolling.  (std_kernel.asm)
- -fixed another overage in the standard kernel leading into the last line, 
+ -fixed another overage in the standard kernel leading into the last line,
   which was corrupting the first scanline of the last line when scrolling.
   (std_kernel.asm)
- -changed the DPC+ virtual sprite maximum from a constant to a variable 
+ -changed the DPC+ virtual sprite maximum from a constant to a variable
   amount. (custom/main.c)
  -added quotes to batch file to allow for paths with spaces. (2600bas.bat)
  -added missing "-i" to optimize preprocess commands. (2600bas.bat)
  -removed "asm" preprocessor expression that was causing an assembly block
   to continue past "end" if "end" had an empty line above it.
  -added optional start_queue and end_queue arguments to DPC+ pfscroll, to
-  allow for scrolling the color queue, or split screen scrolling. 
+  allow for scrolling the color queue, or split screen scrolling.
   (statements.c, custom/main.c)
  -enable P0 display on the first scanline. (DPCplus_kernel.asm)
- -DPC+ bkcolors: and pfcolors: now only use the actual number of colors 
+ -DPC+ bkcolors: and pfcolors: now only use the actual number of colors
   listed, similar to playfield:. (statements.c)
  -disabled fast fetching before the minikernel, and reenabled it after.
   (DPCplus_kernel.asm)
- -batari fixed a bug that messed up the results of an if...then 
+ -batari fixed a bug that messed up the results of an if...then
   statement containing multiple complex () statements. (statements.c)
- -added bbfilter utlity to replace sed for filtering bB symbols out of 
+ -added bbfilter utlity to replace sed for filtering bB symbols out of
   dasm results.
  -updated 2600basic.sh, 2600bas.bat to use bbfilter.
- -updated dasm to dasm-2.20.11-update-20140124, put dasm source in 
+ -updated dasm to dasm-2.20.11-update-20140124, put dasm source in
   contrib/src.
- -added install_win.bat, which will update bB and PATH variables on 
+ -added install_win.bat, which will update bB and PATH variables on
   Windows. requires Windows XP SP2 and later.
  -fixed bug where dim and const didn't work with a trailing : separator.
   (statements.c)
@@ -279,8 +279,8 @@ Ininitally a fork-release, now official
  -fixed bug where ; comments were eating lines and had bad linecount.
   (preprocess.lex)
  -fixed page crossing bug with player1colors in last playfield row.
- -add work-around for complex statements causing "Unknown keyword" on 
-  "then label". 
+ -add work-around for complex statements causing "Unknown keyword" on
+  "then label".
  -reordered memory in 2600basic.h so variables var0 to Z are continuous.
  -moved object motion reset prior to user vblank, to allow for Cosmic Ark
   type effects. (DPCplus_kernel.asm)
@@ -294,12 +294,12 @@ DPC+ kernel updates
  -multiple player definitions
  -pfpixel, pfvline and pfhline
  -Collision detection:
-     * Pixel-perfect collision(player#,player#) where # is 0-9, for any two 
+     * Pixel-perfect collision(player#,player#) where # is 0-9, for any two
        real or virtual player sprites
-     * A kernel_option controls an in-kernel read of a standard hardware 
-       collision register (example: set kernel_options 
-       collision(player1,playfield) will return the y-coordinate where the 
-       first such collision occurs, so you can later figure out what sprite 
+     * A kernel_option controls an in-kernel read of a standard hardware
+       collision register (example: set kernel_options
+       collision(player1,playfield) will return the y-coordinate where the
+       first such collision occurs, so you can later figure out what sprite
        it was.) Value is returned in temp4 after a drawscreen.
  -Smooth scroll in from left or right (upper two bits of NUSIZ control it)
 
@@ -359,7 +359,7 @@ Changes:
  -7800 detection
  -batch file invokes sed to limit DASM's output to something more meaningful
 Fixed bugs:
- -playfield: command in standard kernel now work in all banks rather than 
+ -playfield: command in standard kernel now work in all banks rather than
     just the last
  -fixed point math assignments only worked when at the end of a line
  -blank lines in data statements now allowed
@@ -420,17 +420,17 @@ Major changes:
  -standard kernel now has the ball
  -8.8 and 4.4 fixed point types
    - automatic conversion from one type to another in assignments
-   - addition/subtraction routines do automatic conversion if multiple types 
+   - addition/subtraction routines do automatic conversion if multiple types
      are used
    - immediate decimal numbers allowed, either negative or positive
    - 8.8 types can be used wherever integers are used
-   - 4.4 can't be used anywhere but can be added/subtracted/assigned to other 
+   - 4.4 can't be used anywhere but can be added/subtracted/assigned to other
      types
  -data statement length keyword
  -remove trailing commas from data statements
  -set optimization for size/speed
  -full divide/multiply
-   - optional: multiply can produce a 16-bit result or divide can produce 
+   - optional: multiply can produce a 16-bit result or divide can produce
      remainder
  -bit operations - assign one bit to another
  -for-next loop bug fixed (foward loops by step >1 ended too soon)
@@ -449,7 +449,7 @@ Major changes:
  -score=score+ var now supports vars other than a-z
  -fixed bugs in if-thens for bit reads
  -longer variable names allowed (50 chars max.)
- -allow arrays as arguments in all functions (in user functions or built-in 
+ -allow arrays as arguments in all functions (in user functions or built-in
   fns like pfpixel)
  -improved error handling/reporting:
    - more descriptive errors
@@ -482,7 +482,7 @@ Major changes:
  -vastly improved parser - not nearly as sensitive to spacing
  -dim statement for alternate variable names
  -Upon compilation, DASM shows bytes free in ROM
- -removed exotic illegal opcodes that would cause problems in some emulators, 
+ -removed exotic illegal opcodes that would cause problems in some emulators,
  -like PCAE
  -Included files are now in cr/lf format to patch a limitation of DASM
  -fixed various bugs in pfpixel and pfhline routines
@@ -495,29 +495,29 @@ Initial release.
 The batari Basic team:
 ________________________________________________________________________
 
-I would like to thank those who have helped me develop bB. Actually, lots 
-of people have helped, but some have helped a great deal. This is not a 
+I would like to thank those who have helped me develop bB. Actually, lots
+of people have helped, but some have helped a great deal. This is not a
 complete list of c ontributors or contributions!
 
-Michael Rideout: Wrote the tutorials, added Superchip support, reported 
-  countless bugs, made many helpful suggestions, and is instrumental with 
+Michael Rideout: Wrote the tutorials, added Superchip support, reported
+  countless bugs, made many helpful suggestions, and is instrumental with
   helping others learn the language.
-Bob Montgomery: Rewrote the standard kernel and contributed the multisprite 
+Bob Montgomery: Rewrote the standard kernel and contributed the multisprite
   kernel.
-Kirk Israel: Hosted the bB webpage, created various bB tools, and suggested 
+Kirk Israel: Hosted the bB webpage, created various bB tools, and suggested
   many great improvements.
 Doug Dingus: Documentation of version 0.1, found numerous bugs and wrote the
   first playable game.
 David Galloway: Wrote the fixed-point math module.
 Duane Alan Hahn: Immensely improved the documentation
 Chris Read: Maintains bB game archive.
-Albert Yarusso: For Atariage, without which, bB probably never would have 
+Albert Yarusso: For Atariage, without which, bB probably never would have
   been created!
 
-Acknowledgments: Thomas Jentzsch, John Payson, Zach Matley, Chris Walton, 
+Acknowledgments: Thomas Jentzsch, John Payson, Zach Matley, Chris Walton,
   Glenn Saunders, Manuel Polik and Darrell Spice.
 
-I can't remember what some of the above people have done, but I'm sure they 
+I can't remember what some of the above people have done, but I'm sure they
 were helpful in some way. Some people weren't mentioned because I don't know
  their real names. If I've forgotten anyone, please let me know.
 
