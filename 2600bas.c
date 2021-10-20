@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
     char *path = 0;
     char def[500][100];
     char defr[500][100];
-    char finalcode[500];
     char *codeadd;
     char mycode[500];
     int defi = 0;
@@ -96,7 +95,7 @@ int main(int argc, char *argv[])
 		break;
         if (k_def_search < 495 && code[k_def_search] == ' ' && /* Ensure space was found */
             (k_def_search + 4 < 499) && /* Bounds check for code access */
-        code[k_def_search + 1] == 'd' && code[k_def_search + 2] == 'e' && 
+        code[k_def_search + 1] == 'd' && code[k_def_search + 2] == 'e' &&
         code[k_def_search + 3] == 'f' && code[k_def_search + 4] == ' ')
 	{			// found a define
 	    int current_pos = k_def_search + 5; // current_pos now points to start of define name.
@@ -147,24 +146,19 @@ int main(int argc, char *argv[])
 	    for (def_idx = 0; def_idx < defi; ++def_idx) // Use new loop var def_idx
 	    {
 		codeadd = NULL;
-		finalcode[0] = '\0';
 		defcount = 0;
 		while (1)
 		{
 		    if (defcount++ > 500)
 		    {
 			fprintf(stderr, "(%d) Infinitely repeating definition or too many instances of a definition\n",
-				bbgetline());
+			bbgetline());
 			exit(1);
 		    }
-		    codeadd = strstr (mycode, def[def_idx]);
-		    if (codeadd == NULL)
-			break;
-		    for (j = 0; j < 500; ++j)
-			finalcode[j] = '\0';
-		    strncpy(finalcode, mycode, strlen(mycode) - strlen(codeadd));
-		    strcat (finalcode, defr[def_idx]);
-		    strcat (finalcode, codeadd + strlen (def[def_idx]));
+		    codeadd = strstr(mycode, def[def_idx]);
+		    if (codeadd == NULL) break;
+		    char finalcode[500];
+		    snprintf(finalcode, sizeof(finalcode) - 1, "%s%s%s", mycode, defr[def_idx], codeadd + strlen(def[def_idx]));
 		    strcpy(mycode, finalcode);
 		}
 	    }
