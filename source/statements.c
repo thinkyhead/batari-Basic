@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <math.h>
 #include "statements.h"
 #include "keywords.h"
@@ -77,6 +78,19 @@ char Areg[50];
 int branchtargetnumber = 0;
 
 /**
+ * @brief      Helper to print assembler code
+ *
+ * @param[in]  format     The format string
+ * @param[in]  <unnamed>  Optional additional parameters
+ */
+void asm_printf(const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+}
+
+/**
  * @brief      Macros to print ASM code, with optional parameters
  *
  * @param      ASM   The asm code to print
@@ -84,7 +98,7 @@ int branchtargetnumber = 0;
  * @return     Number of characters printed (ap)
  */
 #define a(ASM) "\t" ASM "\n"
-#define ap(ASM, ...) printf(a(ASM), ##__VA_ARGS__)
+#define ap(ASM, ...) asm_printf(a(ASM), ##__VA_ARGS__)
 
 /**
  * @brief      Get a '#' token if the value is immediate
