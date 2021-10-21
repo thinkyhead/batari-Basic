@@ -26,6 +26,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "macros.h"
+
 // Read the includes.bB file created by bB and build the
 // final assembly that will be sent to DASM.
 //
