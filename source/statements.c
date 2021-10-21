@@ -76,6 +76,54 @@ int doingfunction = 0;
 char Areg[50];
 int branchtargetnumber = 0;
 
+/**
+ * @brief      Get a '#' token if the value is immediate
+ *
+ * @param      value  The value
+ *
+ * @return     Pointer to "#" or "" string
+ */
+char* immedtok(char *value) { return isimmed(value) ? "#" : ""; }
+
+/**
+ * @brief      Get the index part of an address
+ *
+ * @param      mystatement  The statement to parse for an index
+ * @param[in]  myindex      Flag indicating there is an index part
+ *
+ * @return     The given statement with the index added
+ */
+char* indexpart(char *mystatement, int myindex) {
+  static char outstr[50];
+  if (myindex)
+    sprintf(outstr, "%s,x", mystatement); // An address indexed with x!
+  else
+    sprintf(outstr, "%s%s", immedtok(mystatement), mystatement);
+  return outstr;
+}
+
+/**
+ * @brief      Get the fractional part of a declared 8.8 fixpoint variable
+ *
+ * @param      item  The item to scan
+ *
+ * @return     A string containing the fractional part
+ */
+char* fracpart(char *item) {
+  static char outstr[50];
+  for (int i = 0; i < numfixpoint88; ++i) {
+    strcpy(outstr, fixpoint88[1][i]);
+    if (!strcmp(fixpoint88[0][i], item)) return outstr;
+  }
+  // must be immediate value
+  if (findpoint(item))
+    sprintf(outstr, "#%d", (int)(immed_fixpoint(item) * 256.0));
+  else
+    sprintf(outstr, "#0");
+
+  return outstr;
+}
+
 void currdir_foundmsg(char *foundfile) {
   fprintf(stderr, "User-defined %s found in the current directory\n", foundfile);
 }
