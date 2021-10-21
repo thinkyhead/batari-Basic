@@ -77,6 +77,16 @@ char Areg[50];
 int branchtargetnumber = 0;
 
 /**
+ * @brief      Macros to print ASM code, with optional parameters
+ *
+ * @param      ASM   The asm code to print
+ *
+ * @return     Number of characters printed (ap)
+ */
+#define a(ASM) "\t" ASM "\n"
+#define ap(ASM, ...) printf(a(ASM), ##__VA_ARGS__)
+
+/**
  * @brief      Get a '#' token if the value is immediate
  *
  * @param      value  The value
@@ -5153,120 +5163,45 @@ void hotspotcheck(char *linenumber) {
   }
 }
 
-void bmi(char *linenumber) {
-  removeCR(linenumber);
+/**
+ * @brief      Generate assembly for a branch, using a jump for long branches.
+ *
+ * @param      b1       Branch mnemonic for a true result
+ * @param      b2       Branch mnemonic for a false result (or long branch)
+ * @param      linenum  The line number where the branch needs to go
+ */
+void _branch(char *b1, char *b2, char *linenum) {
+  removeCR(linenum);
   if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bmi .%s\n", linenumber, linenumber, linenumber);
+    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n", linenum, linenum);
     // branches might be allowed as below - check carefully to make sure!
-    // printf(" if ((* - .%s) < 127) && ((* - .%s) > -129)\n    bmi .%s\n",linenumber,linenumber,linenumber);
-    printf(" else\n bpl .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
+    // printf(" if ((* - .%s) < 127) && ((* - .%s) > -129)\n\tBMI .%s\n",linenum,linenum,linenum);
+    ap("%s .%s", b1, linenum);
+    printf(" else\n");
+    ap("%s .%dskip%s", b2, branchtargetnumber, linenum);
+    ap("JMP .%s", linenum);
+    printf(".%dskip%s\n", branchtargetnumber++, linenum);
     printf(" endif\n");
   }
   else {
-    printf("    bmi .%s\n", linenumber);
-    hotspotcheck(linenumber);
+    ap("%s .%s", b1, linenum);
+    hotspotcheck(linenum);
   }
 }
 
-void bpl(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bpl .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bmi .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bpl .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
-
-void bne(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   BNE .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n beq .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bne .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
-
-void beq(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   BEQ .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bne .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    beq .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
-
-void bcc(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bcc .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bcs .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bcc .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-
-}
-
-void bcs(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bcs .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bcc .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bcs .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
-
-void bvc(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bvc .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bvs .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bvc .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
-
-void bvs(char *linenumber) {
-  removeCR(linenumber);
-  if (smartbranching) {
-    printf(" if ((* - .%s) < 127) && ((* - .%s) > -128)\n   bvs .%s\n", linenumber, linenumber, linenumber);
-    printf(" else\n bvc .%dskip%s\n jmp .%s\n", branchtargetnumber, linenumber, linenumber);
-    printf(".%dskip%s\n", branchtargetnumber++, linenumber);
-    printf(" endif\n");
-  }
-  else {
-    printf("    bvs .%s\n", linenumber);
-    hotspotcheck(linenumber);
-  }
-}
+/**
+ * @brief      Branch helpers
+ *
+ * @param      linenum  The branch to generate
+ */
+void bmi(char *linenum) { _branch("BMI", "BPL", linenum); }
+void bpl(char *linenum) { _branch("BPL", "BMI", linenum); }
+void bne(char *linenum) { _branch("BNE", "BEQ", linenum); }
+void beq(char *linenum) { _branch("BEQ", "BNE", linenum); }
+void bcc(char *linenum) { _branch("BCC", "BCS", linenum); }
+void bcs(char *linenum) { _branch("BCS", "BCC", linenum); }
+void bvc(char *linenum) { _branch("BVC", "BVS", linenum); }
+void bvs(char *linenum) { _branch("BVS", "BVC", linenum); }
 
 /**
  * @brief      Generate code for the 'drawscreen' statement
