@@ -1,68 +1,74 @@
-batari Basic - COMPILE.txt - Version 1.0 - 2013.09.24
+batari Basic - COMPILE.txt - Version 1.1 - 27 Mar 2021
 
 _What_Is_This_Doc?_
 
   This is the bB utility compilation documentation. It's meant to be helpful
   for those of you that wish to rebuild the bB utilities from source code.
 
-  If you only want to use bB as provided, you can stop reading now.
-
+  If you only want to use the latest release of bB as provided, you can stop
+  reading now. If you need to build new tools -or are just curious- press on!
 
 _Requirements_
 
-  A Unix type system, or mingw32/cygwin environment on Windows, with...
+  Building these tools requires an ANSI-compliant build system such as GCC.
+  All of the batari-Basic compiler's code is written in plain ANSI C with
+  standard libraries, so it should be easy to adapt to your favorite compiler
+  or IDE, or to translate to other high-level languages.
 
-    -lex/flex
-    -make
-    -an ANSI C compiler
+  This package provides a `makefile` to build the tools from the GNU shell,
+  which is a standard feature on Linux and macOS. On Windows you'll need to add
+  Windows Subsystem for Linux (WSL), or on an older system, Mingw32 or Cygwin.
+  In sum you need to have all these utilities installed:
 
+    - lex / flex - A Lexical processor
+    - make - To run the `makefile`
+    - An ANSI C compiler like GCC, Clang, etc.
 
 _Quick_Build_From_Source_
 
   If you just wish to get bB running on your platform, and not create a full
-  distribution of bB, building bB should just require typing "make" from
-  command-line while inside the bB directory.
-
+  distribution of bB, you can just type `make` at the command-line while inside
+  the `PROJECT/source` directory. If all goes well the `build` folder will
+  contain all the built tools, ready to be copied into your final bB folder.
 
 _Cross_Compiling_All_OS_Binaries_
 
-  The official binaries are produced under Linux using cross-compiling for the
-  Windows and OS X binaries.
+  Historically, binary release packages for batari-Basic have been produced under
+  Linux using cross-compiling for the Windows and macOS binaries. So scripts
+  and instructions are still included here. Today we can use Continuous Deployment
+  and a free infrastructure to build each version natively on its own platform.
 
-  Setting up cross compilers is the difficult part. Building all OS binaries
-  is just a matter of typing "make dist" in the bB directory. This will call
-  each OS specific makefile in turn.
+  Setting up cross compilers has always been the difficult part. But once that part
+  is out of the way, you can build all OS binaries just by typing `make dist` in the
+  `PROJECT/source` directory. This builds each platform-specific set of tools in turn.
 
   If you want to cross compile just one particular set of OS binaries, specify
-  the os-specific makefile with the -f switch. e.g. make -f makefile.xcmp.win32
-
+  the os-specific makefile with the `-f` switch. (e.g., make -f makefile.xcmp.win32)
 
   _Cross_Compiling_for_Windows_
 
-    The mingw64 gcc is used for producing Windows binaries. To set this up
+    The mingw64 GCC is used for producing Windows binaries. To set this up
     under Ubuntu or Debian should just be a matter of typing
     "sudo apt-get install mingw-w64" from command-line.
 
-    For cross compiling from other OSes, look up instructions at
+    For cross-compiling from other OSes, look up instructions at
     http://www.mingw.org/
 
+  _Cross_Compiling_for_macOS_
 
-  _Cross_Compiling_for_OS_X_
-
-    Cross compiling OS X requires a custom gcc and Apple SDK. The easiest way
+    Cross compiling OS X requires a custom GCC and Apple SDK. The easiest way
     to aquire these is from an unofficial, but readily available, repository.
 
-    The following instructions are for recent versions of Ubuntu, though it
-    may work with other closely related OSes, like Debian and Mint.
+    The following instructions are for recent versions of Ubuntu, though they
+    may work with other closely-related OSes, like Debian or Mint.
 
     Cross Compiling for OS X on another OS is out of the scope of this doc,
-    but sufficed to say you'll need Apple-patched gcc sources, Apple-patched
+    but suffice it to say you'll need Apple-patched GCC sources, Apple-patched
     odcctools sources, and the Apple 10.5 SDK.
-
 
     _Cross_Compiling_OS_X_on_Ubuntu_64-bit_x86_
 
-      break out your command prompt, and...
+      Open up your terminal and type the following commands...
 
       wget https://launchpad.net/~flosoft/+archive/ubuntu/cross-apple/+files/apple-uni-sdk-10.5_20110407-0.flosoft1_amd64.deb
       wget https://launchpad.net/~flosoft/+archive/ubuntu/cross-apple/+files/apple-x86-odcctools_758.159-0flosoft11_amd64.deb
@@ -72,15 +78,14 @@ _Cross_Compiling_All_OS_Binaries_
       sudo dpkg -i apple-x86-odcctools_758.159-0flosoft11_amd64.deb
       sudo dpkg -i apple-x86-gcc_4.2.1~5646.1flosoft2_amd64.deb
 
-      NOTE: if you may get an error of "Package libssl0.9.8 is not installed"
-      when you try to install odcctools, install libssl 0.9.8...
+      NOTE: If you get the error "Package libssl0.9.8 not installed" when installing odcctools, install libssl 0.9.8...
+
       wget http://archive.ubuntu.com/ubuntu/pool/universe/o/openssl098/libssl0.9.8_0.9.8o-7ubuntu3.1_amd64.deb
       sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.1_amd64.deb
 
-
     _Cross_Compiling_OS_X_on_Ubuntu_32-bit_x86_
 
-      break out your command prompt, and...
+      Open up your terminal and type the following commands...
 
       wget https://launchpad.net/~flosoft/+archive/ubuntu/cross-apple/+files/apple-uni-sdk-10.5_20110407-0.flosoft1_i386.deb
       wget https://launchpad.net/~flosoft/+archive/ubuntu/cross-apple/+files/apple-x86-odcctools_758.159-0flosoft11_i386.deb
@@ -90,7 +95,10 @@ _Cross_Compiling_All_OS_Binaries_
       sudo dpkg -i apple-x86-odcctools_758.159-0flosoft11_i386.deb
       sudo dpkg -i apple-x86-gcc_4.2.1~5646.1flosoft2_i386.deb
 
-      NOTE: if you may get an error of "Package libssl0.9.8 is not installed"
-      when you try to install odcctools, install libssl 0.9.8...
+      NOTE: If you get the error "Package libssl0.9.8 not installed" when installing odcctools, install libssl 0.9.8...
+
       wget http://archive.ubuntu.com/ubuntu/pool/universe/o/openssl098/libssl0.9.8_0.9.8o-7ubuntu3.2.14.04.1_i386.deb
       sudo dpkg -i libssl0.9.8_0.9.8o-7ubuntu3.2.14.04.1_i386.deb
+
+    You might also try the XCHAIN toolset at https://github.com/Tatsh/xchain which supports newer systems.
+    At this time there is no clear method to build for macOS on arm64 for the M1 processor.
