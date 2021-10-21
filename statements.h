@@ -44,6 +44,7 @@ int islabel(char **);
 int islabelelse(char **);
 void compressdata(char **, int, int);
 void shiftdata(char **, int);
+float immed_fixpoint(char *);
 int findpoint(char *);
 int getindex(char *, char *);
 int bbgetline();
