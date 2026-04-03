@@ -1,13 +1,19 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
+/**
+ * bAtari-Basic
+ * Copyright (c) 2026
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
 
-/*
-     bBfilter
-	filters out the huge dasm "Unresolved Symbols" list, which is useless
-	for us since all of the optional language features own several
-	harmless unresolved symbols.
-	We now use a dasm that complains about the exact symbols that caused
-	the assembly to be unresolvable.
-*/
+/**
+ * bbfilter.c
+ * Read from stdin, filter out a bunch of bB symbol names, and write to stdout.
+ *
+ * Filter out the huge dasm "Unresolved Symbols" list, which is useless
+ * for us since all of the optional language features own several
+ * harmless unresolved symbols.
+ * We now use a dasm that complains about the exact symbols that caused
+ * the assembly to be unresolvable.
+ */
 
 #define BUFSIZE 4096
 

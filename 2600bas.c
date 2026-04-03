@@ -1,4 +1,14 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
+/**
+ * bAtari-Basic
+ * Copyright (c) 2026
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
+
+/**
+ * 2600bas.c
+ * Compile Batari Basic into Assembler suitable for compilation
+ * by dasm and execution in an Atari 2600 system or emulation.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

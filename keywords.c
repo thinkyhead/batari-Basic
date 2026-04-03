@@ -1,4 +1,13 @@
-// Provided under the GPL v2 license. See the included LICENSE.txt for details.
+/**
+ * bAtari-Basic
+ * Copyright (c) 2026
+ * Provided under the GPL v2 license. See the included LICENSE.txt for details.
+ */
+
+/**
+ * keywords.c
+ * Entry-point for individual Batari Basic statement conversion.
+ */
 
 #include "keywords.h"
 #include "statements.h"
@@ -54,7 +63,7 @@ void keywords(char **cstatement)
     // check if there are boolean && or || in an if-then.
     // change && to "then if"
     // change || to two if thens
-    // also change operands around to allow <= and >, since 
+    // also change operands around to allow <= and >, since
     // currently all we can do is < and >=
     // if we encounter an else, break into two lines, and the first line jumps ahead.
     door = 0;
@@ -479,7 +488,6 @@ void keywords(char **cstatement)
 	    statement[j - k + 1] = cstatement[j];
 	for (; (j - k + 1) < 200; ++j)
 	    statement[j - k + 1][0] = '\0';
-
 
     }
     if (foundelse)
