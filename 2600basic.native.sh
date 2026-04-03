@@ -13,7 +13,7 @@ if [ ! -f "$bB/dasm" ] ; then
   else
     echo "### WARNING: dasm wasn't found in the bB directory. Using an external dasm."
     echo "    bB error reporting features have minimum dasm version requirements."
-    echo 
+    echo
   fi
 else
   DDIR="$bB"
@@ -56,7 +56,7 @@ fi
 $DDIR/dasm "$1.asm" -I"$bB/includes" -f3 -l"$1.lst" -p20 -s"$1.sym" -o"$1.bin" | $bB/bbfilter
 
 if [ -f "$bB/relocateBB" ]; then
-  $bB/relocateBB "$1.bin" 
+  $bB/relocateBB "$1.bin"
 fi
 
 # --- Create a .elf file to flash PXE games to Chameleon Cart ---

@@ -103,7 +103,7 @@ WaitForOverscanEnd
 	clc
 	adc #$80
 	sta P0Bottom
-	
+
 
 	;--some final setup
 
@@ -142,7 +142,7 @@ PositionASpriteSubroutine	;call this function with A == horizontal position (0-1
 				;if you do not wish to write to P1 during this function, make
 				;sure Y==0 before you call it.  This function will change Y, and A
 				;will be the value put into HMxx when returned.
-				;Call this function with at least 11 cycles left in the scanline 
+				;Call this function with at least 11 cycles left in the scanline
 				;(jsr + sec + sta WSYNC = 11); it will return 9 cycles
 				;into the second scanline
 	sec
@@ -169,11 +169,11 @@ PrePositionAllObjects
 	ldx #4
 	lda ballx
 	jsr PositionASpriteSubroutine
-	
+
 	dex
 	lda missile1x
 	jsr PositionASpriteSubroutine
-	
+
 	dex
 	lda missile0x
 	jsr PositionASpriteSubroutine
@@ -229,9 +229,9 @@ AdjustYValuesUpLoop
  endif
 	bcc nottoohigh
 	lda P0Bottom
-	sta P0Top		
+	sta P0Top
 
-       
+
 
 nottoohigh
 	rts
@@ -431,7 +431,7 @@ asdhj
   sbc pfsub,x
  endif
  endif
- 
+
  sta pfpixelheight
 
  ifconst screenheight
@@ -439,7 +439,7 @@ asdhj
  else
 	ldy #88
  endif
- 
+
 ;	lda #$02
 ;	sta COLUBK		;+5	18
 
@@ -492,7 +492,7 @@ cyclebalance
 
 	cpy missile0y
 	php			;+6	 1
-	
+
 
 	dey			;+2	15
 
@@ -507,7 +507,7 @@ newrepo ; since we have time here, store next repoline
  tax
  lda NewSpriteY,x
  sta temp6
- sleep 4 
+ sleep 4
 
 BackFromRepoKernel
 	tya			;+2	45
@@ -525,7 +525,7 @@ pagewraphandler
  jmp cyclebalance
 
 ;-------------------------------------------------------------------------
- 
+
  ; room here for score?
 
 setscorepointers
@@ -597,7 +597,7 @@ retXKR
 	sta GRP0		;+3	54	VDEL
 BackFromSwitchDrawP0KR
 	sec			;+2	56
- 
+
 
 
 	lda PF2temp1,X
@@ -613,7 +613,7 @@ BackFromSwitchDrawP0KR
 	lda #0
 	sta GRP1		;+5	75	to display player 0
 	lda NewSpriteX,X	;+4	 6
- 
+
 DivideBy15LoopK				;	 6	(carry set above)
 	sbc #15
 	bcs DivideBy15LoopK		;+4/5	10/15.../60
@@ -637,9 +637,9 @@ DivideBy15LoopK				;	 6	(carry set above)
 
 	cpy missile0y
 	php			;+6	21
-	
 
- 
+
+
 
 
 ;15 cycles
@@ -666,7 +666,7 @@ BackFromSwitchDrawP0KV
 	lda PF2temp1,X
 	sta PF2			;+7	 5
 	lda PF1temp1,X
-	sta PF1			;+7	74 
+	sta PF1			;+7	74
  sta HMOVE
 
 	lda #0
@@ -733,7 +733,7 @@ SetNextLine
 ;	lda NewSpriteY-1,x
 	lda.w temp6
 SetLastLine
-	sta RepoLine	
+	sta RepoLine
 
  tya
  and pfheight
@@ -741,8 +741,8 @@ SetLastLine
  dec pfpixelheight
 	dey			;+2	30
 
-; 10 cycles 
- 
+; 10 cycles
+
 
 	jmp BackFromRepoKernel	;+3	43
 
@@ -786,10 +786,10 @@ BottomOfKernelLoop
         STy VDELP1
         LDA #$10
         STA HMP1
-               LDA scorecolor 
+               LDA scorecolor
                 STA COLUP0
                 STA COLUP1
- 
+
         LDA #$03
         STA NUSIZ0
         STA NUSIZ1
@@ -856,10 +856,10 @@ beginscore
 ; sta temp1
  sty scorepointers+1
 
-                LDA #0   
+                LDA #0
                STA GRP0
                 STA GRP1
- sta PF1 
+ sta PF1
        STA VDELP0
         STA VDELP1;do we need these
         STA NUSIZ0
@@ -897,7 +897,7 @@ skipscore
 	sta VBLANK	;turn on VBLANK
 
 
-	
+
 
 
 ;-------------------------------------------------------------------------
@@ -968,7 +968,7 @@ sortloop
  cmp spriteheight,x
  bcs countdown
 ; overlap with x+1>x
-; 
+;
 ; stick x at end of gfxtable, dec counter
 overlapping
  dec temp3
@@ -993,20 +993,20 @@ largerXislower ; (temp1>A)
  ldx temp2
 ; inx
  jsr shiftnumbers
- jmp skipswapGfxtable 
+ jmp skipswapGfxtable
 notoverlapping
 ; ldx temp2 ; swap display table
 ; ldy SpriteGfxIndex+1,x
 ; lda SpriteGfxIndex,x
 ; sty SpriteGfxIndex,x
-; sta SpriteGfxIndex+1,x 
+; sta SpriteGfxIndex+1,x
 
 skipswapGfxtable
  ldx temp2 ; swap sort table
  ldy spritesort+1,x
  lda spritesort,x
  sty spritesort,x
- sta spritesort+1,x 
+ sta spritesort+1,x
 
 countdown
  dec temp2
@@ -1040,7 +1040,7 @@ shiftnumbers
 ; ldy SpriteGfxIndex,x
 swaploop
  cpx #4
- beq shiftdone 
+ beq shiftdone
  lda SpriteGfxIndex+1,x
  sta SpriteGfxIndex,x
  inx
@@ -1055,7 +1055,7 @@ debugcycles
    lda INTIM ; display # cycles left in the score
 
  ifconst mincycles
- lda mincycles 
+ lda mincycles
  cmp INTIM
  lda mincycles
  bcc nochange
@@ -1091,5 +1091,3 @@ scorebcd1
  endif
 
     ;echo "Multi-sprite kernel ends at ", *
-
-    

@@ -58,7 +58,7 @@ fi
 wasmtime run --dir=. --dir="$bB" "$bB/dasm.wasm" "$1.asm" -I"$bB/includes" -f3 -l"$1.lst" -p20 -s"$1.sym" -o"$1.bin" | wasmtime "$bB/bbfilter.wasm"
 
 if [ -f "$bB/relocateBB.wasm" ] ; then
-    wasmtime run --dir="$PWD" --dir=. --dir="$bB" "$bB"/relocateBB.wasm "$1.bin" 
+    wasmtime run --dir="$PWD" --dir=. --dir="$bB" "$bB"/relocateBB.wasm "$1.bin"
 else
     echo "relocateBB skipped. A compatible relocateBB wasn't found."
 fi

@@ -21,7 +21,7 @@ jobs:
 
     - name: Install dos2unix
       run: sudo apt-get install dos2unix
-      
+
     - name: Set Version
       run: |
         if [ ${{ vars.VERSION_SUFFIX }} ]; then
@@ -44,7 +44,7 @@ jobs:
         ./make_relocateBB.sh
         ./make_pxebin2ccelf.sh
         ./make_dasm_wasm.sh
-        cd ..   
+        cd ..
 
     - name: Make Packages
       run: ./makepackages.sh

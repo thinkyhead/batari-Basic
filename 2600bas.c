@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 		break;
         if (k_def_search < 495 && code[k_def_search] == ' ' && /* Ensure space was found */
             (k_def_search + 4 < 499) && /* Bounds check for code access */
-        code[k_def_search + 1] == 'd' && code[k_def_search + 2] == 'e' && 
+        code[k_def_search + 1] == 'd' && code[k_def_search + 2] == 'e' &&
         code[k_def_search + 3] == 'f' && code[k_def_search + 4] == ' ')
 	{			// found a define
 	    int current_pos = k_def_search + 5; // current_pos now points to start of define name.
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
 
 	keywords(statement);
         if(numconstants==(MAXCONSTANTS-1))
-        { 
+        {
 		fprintf(stderr, "(%d) Maximum number of constants exceeded.\n", bbgetline());
 		exit(1);
         }

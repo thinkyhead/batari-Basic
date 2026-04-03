@@ -54,7 +54,7 @@ void keywords(char **cstatement)
     // check if there are boolean && or || in an if-then.
     // change && to "then if"
     // change || to two if thens
-    // also change operands around to allow <= and >, since 
+    // also change operands around to allow <= and >, since
     // currently all we can do is < and >=
     // if we encounter an else, break into two lines, and the first line jumps ahead.
     door = 0;
@@ -417,7 +417,7 @@ void keywords(char **cstatement)
 		 || (!strncmp(statement[1], "player5color:", 13))
 		 || (!strncmp(statement[1], "player6color:", 13))
 		 || (!strncmp(statement[1], "player7color:", 13))
-		 || (!strncmp(statement[1], "player8color:", 13)) 
+		 || (!strncmp(statement[1], "player8color:", 13))
 		 || (!strncmp(statement[1], "player9color:", 13))
 		 || (!strncmp(statement[1], "player10color:", 14))
 		 || (!strncmp(statement[1], "player11color:", 14))

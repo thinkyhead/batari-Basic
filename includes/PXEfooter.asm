@@ -2,7 +2,7 @@
 
  org $fffc + ROM_START
  rorg $fffc
-end_of_address_space 
+end_of_address_space
  .word (start & $ffff)
  .word (start & $ffff)
 

@@ -4,7 +4,7 @@ end_drawscreen
      rts
 
 fetcher_address_table
-dflow     
+dflow
      .byte <P0COLOR
      .byte <P1COLOR
      .byte <P0GFX
@@ -37,6 +37,6 @@ dffrachi
      .byte (>PF1R)
      .byte (>PF2R)
      .byte (>PFCOLS)
-     .byte (>NUSIZREFP) 
+     .byte (>NUSIZREFP)
      .byte (>BKCOLS)
      .byte (>P1HMP)

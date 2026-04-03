@@ -10,7 +10,7 @@ if errorlevel 1 (
 )
 
 set TOOL=%~n0
-set DIRS=--dir . 
+set DIRS=--dir .
 set ARGS=
 
 REM Parse command-line arguments

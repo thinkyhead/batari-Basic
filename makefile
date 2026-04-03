@@ -9,7 +9,7 @@ CC=cc
 LEX=lex
 LEXFLAGS=-t
 
-all: 2600basic preprocess postprocess optimize bbfilter 
+all: 2600basic preprocess postprocess optimize bbfilter
 
 2600basic: 2600bas.c statements.c keywords.c statements.h keywords.h
 	${CC} ${CFLAGS} -o 2600basic 2600bas.c statements.c keywords.c

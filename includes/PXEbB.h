@@ -249,12 +249,12 @@ var60 ds 1
 
 stack_reserved ds 10
 ; echo "free ZP ram:",($100-*)d
- 
+
  SEG.U vars
  org $0300
- 
+
  ; allocate additional vars here as needed
- 
+
  echo "free extended ram:",($700-*)d
 
 

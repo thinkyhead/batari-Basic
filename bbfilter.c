@@ -55,7 +55,7 @@ void dasm_error_glue(char *linebuffer)
 
     if (linebuffer == NULL)
         return;
-    mnemonic_error = strstr (linebuffer, "error: Unknown Mnemonic"); 
+    mnemonic_error = strstr (linebuffer, "error: Unknown Mnemonic");
     if (mnemonic_error == NULL)
         return;
 
@@ -90,21 +90,21 @@ void dasm_error_glue(char *linebuffer)
         return;
     *temp_point = 0;
     // ** b. convert the string to a long value, with sanity checking...
-    asm_line_number = atol (asm_line_number_str);        
+    asm_line_number = atol (asm_line_number_str);
     if ((asm_line_number == 0) && (strcmp(asm_line_number_str,"0")!=0))
         return;
     if (asm_line_number < 0)
         return;
 
     // ** 3. Get our assembly file name
-    // ** a. to allow for spaces in our file name, we need to use the 
-    //       '(###)' line number string as the name delimiter 
+    // ** a. to allow for spaces in our file name, we need to use the
+    //       '(###)' line number string as the name delimiter
     temp_point = strchr(linebuffer,'(');
     if (temp_point == NULL)
         return; // shouldn't be possible, but better to be safe...
     if (temp_point == linebuffer)
         return; // leave if somehow the assembly filename was omitted!
-    temp_point--; 
+    temp_point--;
     *temp_point = 0;
     asm_filename = linebuffer;
 
@@ -161,7 +161,7 @@ void  report_basic_line_from_asm(char *asm_filename, long int asm_line_number, c
             strncpy(line_save_str,bas_str,BUFSIZE);
             last_tagged_line = t;
         }
-	
+
         // Only report with helpful info if we saw the basic line number
         // in the last 8 assembly lines. We only want to report on asm
         // that was generated from basic code.

@@ -171,15 +171,15 @@ PALETTE ; the Initial NTSC or PAL palette is copied to this RAM location at boot
     ;
     ; ww: PF width. How many PF columns wide to scroll through horizontally. Each PF column is 8 PF pixels wide (32 pixels)
     ;   0: 4 columns with sides set to PF0. No horizontal scrolling. Primarily for backwards compatability with DPC+ kernel.
-    ;   1: 5 columns. 160 (40 PF) Pixels wide. 
+    ;   1: 5 columns. 160 (40 PF) Pixels wide.
     ;   2: 10 columns. 320 (80 PF) Pixels wide.
     ;   3: 15 columns. 480 (120 PF) Pixels wide.
 PF_MODE ; cbfo vpww
     .byte $00
 
-    ; 0-14 Which playfield column write operations will start with 
+    ; 0-14 Which playfield column write operations will start with
     ; when writing multiple columns the operation will wrap back to column 0 after column 14
-PF_WRITE_INDEX 
+PF_WRITE_INDEX
     .byte $00
 
     ; Horizontal scroll position in pixels. I.E. 16 would move Playfield 4 PF pixels left.
@@ -365,9 +365,9 @@ miniKernelCount .byte 0
 
 ; Types
 mkMultiSprite = 0   ; player0Height graphicLo graphicHi colorLo colorHi nusiz0 player0x player0y
-mkScore = 1 ; paddingTop barLeft barRight digitsLeft digitsMiddle digitsRight colubk colupf   
+mkScore = 1 ; paddingTop barLeft barRight digitsLeft digitsMiddle digitsRight colubk colupf
 mk48Pixel = 2 ; paddingTop graphicLo graphicHi colorLo colorHi index graphicHeight
-     
+
 miniKernelId SET 0
  REPEAT 24
 miniKernel,miniKernelId,"type" .byte 0
@@ -400,7 +400,7 @@ miniKernel,miniKernelId,"player0y"
 miniKernel,miniKernelId,"colupf" .byte 0
 
 miniKernelId SET miniKernelId+1
- REPEND     
+ REPEND
 
 
      ORG $1080 + ROM_START
